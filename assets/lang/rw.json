@@ -20,7 +20,15 @@
     "Share": "Sakaza",
     "Search": "Gushakisha",
     "searchPlaceholder": "Shakisha umutwe wi gitabo , umwanditsi cyangwa icyiciro",
-    "searchResultText": "Ibyo washakishe biriyereka aha"
-
+    "searchResultText": "Ibyo washakishe biriyereka aha",
+    "support": "Inkunga",
+    "changeLanguage": "Hindura imvugo",
+    "chapter": "Umutwe",
+    "getInTouch": "Vugana",
+    "supportTitle": "Nigute dushobora kugufasha?",
+    "supportText": "Twandikire kugirango tugufashe, kandi ikipe yacu izishimira kugufasha.",
+    "callUs": "Hamagara",
+    "emailUs": "Twandikire",
+    "ourWebsite": "Sura urubuga rwacu"
   }
   

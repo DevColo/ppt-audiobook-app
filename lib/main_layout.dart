@@ -7,6 +7,7 @@ import 'package:precious/screens/categories_screen.dart';
 import 'package:precious/screens/home_screen.dart';
 import 'package:precious/screens/search_screen.dart';
 import 'package:precious/screens/semons_screen.dart';
+import 'package:precious/screens/settings_screen.dart';
 import 'package:precious/utils/config.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -210,7 +211,7 @@ class _MainLayoutState extends State<MainLayout> {
           CategoriesScreen(),
           SermonsScreen(),
           AudioBooksScreen(),
-          HomeScreen(),
+          SettingsScreen(),
         ],
       ),
 

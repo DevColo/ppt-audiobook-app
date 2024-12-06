@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:precious/providers/audio_books_provider.dart';
 import 'package:precious/providers/categories_provider.dart';
 import 'package:precious/providers/sermons_provider.dart';
+import 'package:precious/screens/get_in_touch_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:precious/main_layout.dart';
 import 'package:precious/screens/welcome_screen.dart';
@@ -41,6 +42,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const WelcomeScreen(),
         'main': (context) => const MainLayout(),
+        'get_in_touch': (context) => const GetInTouchScreen(),
       },
     );
   }

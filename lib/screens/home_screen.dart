@@ -75,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         itemCount: categories.length,
                         itemBuilder: (context, index) {
                           final category = categories[index];
-                          return BookCategory(
+                          return bookCategory(
                               category['title'], category['id']);
                         },
                       ),
@@ -181,19 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildShimmerEffect() {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
-      child: Container(
-        color: Colors.white,
-        height: 120,
-        width: double.infinity,
-      ),
-    );
-  }
-
-  Widget BookCategory(String label, int id) {
+  Widget bookCategory(String label, int id) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5.0),
       child: GestureDetector(
@@ -421,7 +409,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const Spacer(),
             const Icon(
-              Icons.play_circle_fill,
+              Icons.arrow_forward_ios,
               color: Colors.grey, // Adjusted for shimmer
               size: 25.0,
             ),

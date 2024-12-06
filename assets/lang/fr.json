@@ -20,5 +20,14 @@
   "Share": "Partager",
   "Search": "Rechercher",
   "searchPlaceholder": "Rechercher par titre, auteur ou catégorie",
-  "searchResultText": "Les résultats de recherche s'afficheront ici"
+  "searchResultText": "Les résultats de recherche s'afficheront ici",
+  "support": "Soutien",
+  "changeLanguage": "Changer de langue",
+  "chapter": "Chapitre",
+  "getInTouch": "Entrer en contact",
+  "supportTitle": "Comment pouvons-nous vous aider?",
+  "supportText": "Contactez-nous pour obtenir de l’aide et notre équipe se fera un plaisir de vous aider.",
+  "callUs": "Appelez-nous",
+  "emailUs": "Envoyez-nous un courriel",
+  "ourWebsite": "Visitez notre site Web"
 }

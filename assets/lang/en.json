@@ -20,6 +20,15 @@
     "Share": "Share",
     "Search": "Search",
     "searchPlaceholder": "Search by title, author or category",
-    "searchResultText": "The search results will display here"
+    "searchResultText": "The search results will display here",
+    "support": "Support",
+    "changeLanguage": "Change language",
+    "chapter": "Chapter",
+    "getInTouch": "Get in touch",
+    "supportTitle": "How may we assist you?",
+    "supportText": "Contact us for assistance, and our team will be happy to help you.",
+    "callUs": "Call us",
+    "emailUs": "Email us",
+    "ourWebsite": "Visit our website"
   }
   

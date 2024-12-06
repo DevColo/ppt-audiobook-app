@@ -284,8 +284,14 @@ class _AudioScreenState extends State<AudioScreen> {
                             itemBuilder: (context, index) {
                               if (audioChapters.isEmpty) {
                                 return const Center(
-                                  child: Text('No Audio Chapter'),
-                                );
+                                    child: Text(
+                                  'No Audio Chapter',
+                                  style: TextStyle(
+                                    color: Config.whiteColor,
+                                    fontFamily: 'Montserrat-Regular',
+                                    fontSize: 12,
+                                  ),
+                                ));
                               } else {
                                 final chapter = audioChapters[index];
                                 return audioChapter(
