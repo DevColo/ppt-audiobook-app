@@ -1,13 +1,17 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:precious/providers/app_provider.dart';
+import 'package:precious/providers/audio_books_provider.dart';
+import 'package:precious/providers/sermons_provider.dart';
 import 'package:precious/screens/audio_books_screen.dart';
 import 'package:precious/screens/categories_screen.dart';
 import 'package:precious/screens/home_screen.dart';
+import 'package:precious/screens/search_screen.dart';
 import 'package:precious/screens/semons_screen.dart';
-import 'package:precious/screens/video_collection_screen.dart';
-import 'package:precious/src/static_images.dart';
 import 'package:precious/utils/config.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'utils/localization_service.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -19,41 +23,37 @@ class MainLayout extends StatefulWidget {
 class _MainLayoutState extends State<MainLayout> {
   int currentPage = 0;
   final PageController _pageController = PageController();
-  Map<String, dynamic> user = {};
 
   // Global key for the scaffold to control the drawer
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   // Default selected language
-  String selectedLanguage = 'English';
+  String selectedLanguage = 'Kinyarwanda';
 
   // List of language options
   final List<Map<String, String>> languages = [
-    {'language': 'English', 'flag': 'assets/images/eng.png'},
-    {'language': 'French', 'flag': 'assets/images/fr.png'},
-    {'language': 'Kinyarwanda', 'flag': 'assets/images/rw.png'},
-    {'language': 'Swahili', 'flag': 'assets/images/sw.png'},
+    {'language': 'English', 'flag': 'assets/images/english.png', 'code': 'en'},
+    {'language': 'French', 'flag': 'assets/images/french.png', 'code': 'fr'},
+    {
+      'language': 'Kinyarwanda',
+      'flag': 'assets/images/kinyarwanda.png',
+      'code': 'rw'
+    },
+    {
+      'language': 'Swahili',
+      'flag': 'assets/images/kiswahili.png',
+      'code': 'sw'
+    },
   ];
 
   @override
   void initState() {
     super.initState();
-    _loadUserData();
     _loadPage();
+    _loadLanguage();
   }
 
-  Future<void> _loadUserData() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final userData = prefs.getString('user_data');
-    if (userData != null) {
-      setState(() {
-        user = Map<String, dynamic>.from(jsonDecode(userData));
-      });
-    } else {
-      Navigator.pushNamed(context, 'login');
-    }
-  }
-
+  // Load the current page index from SharedPreferences
   void _loadPage() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -61,9 +61,45 @@ class _MainLayoutState extends State<MainLayout> {
     });
   }
 
+  // Save the current page index to SharedPreferences
   void _savePage(int page) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setInt('currentPage', page);
+  }
+
+  // Load the selected language from SharedPreferences
+  Future<void> _loadLanguage() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      selectedLanguage = prefs.getString('selectedLanguage') ?? 'Kinyarwanda';
+    });
+    // Map language name to code
+    String languageCode = 'rw';
+    if (selectedLanguage == 'French') {
+      languageCode = 'fr';
+    } else if (selectedLanguage == 'Kinyarwanda') {
+      languageCode = 'rw';
+    } else if (selectedLanguage == 'Swahili') {
+      languageCode = 'sw';
+    } else if (selectedLanguage == 'English') {
+      languageCode = 'en';
+    }
+    await LocalizationService().loadLanguage(languageCode);
+    await _fetchDataBasedOnLanguage();
+  }
+
+  Future<void> _fetchDataBasedOnLanguage() async {
+    final appProvider = Provider.of<AppProvider>(context, listen: false);
+    await appProvider.getMostReadBooks();
+    await appProvider.getNewReleasedBooks();
+
+    final sermonsProvider =
+        Provider.of<SermonsProvider>(context, listen: false);
+    await sermonsProvider.getPastors();
+
+    final audioProvider =
+        Provider.of<AudioBooksProvider>(context, listen: false);
+    await audioProvider.getAudioBooks();
   }
 
   @override
@@ -73,103 +109,92 @@ class _MainLayoutState extends State<MainLayout> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Row(
-          //mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment
+              .spaceBetween, // Space between start and end icons
           children: [
-            // Search Input
-            Expanded(
-              child: Material(
-                //elevation: 0.5,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50.0),
-                ),
-                child: Container(
-                  height: 40.0,
-                  width: 300,
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  child: const TextField(
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(
-                        Icons.search_outlined,
-                        color: Colors.grey,
-                        size: 18.0,
-                      ),
-                      hintText: 'Search by title, author, or category',
-                      hintStyle: TextStyle(
-                        fontSize: 16.0,
-                        color: Colors.grey,
-                      ),
-                      fillColor: Color.fromARGB(255, 254, 254, 254),
-                      filled: true,
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(
-                            Radius.circular(50.0)), // Add border radius
-                        borderSide: BorderSide(
-                          color: Colors.transparent, // Transparent border
-                          width: 0.0,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(
-                            Radius.circular(50.0)), // Add border radius
-                        borderSide: BorderSide(
-                          color: Colors.transparent, // Transparent border
-                          width: 0.0,
-                        ),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(
-                        vertical: 10.0,
-                        horizontal: 20.0,
-                      ),
-                    ),
-                    cursorColor: Colors.grey,
-                  ),
-                ),
-              ),
+            // Search Icon at Start
+            IconButton(
+              icon: const Icon(Icons.search, size: 24.0),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SearchScreen()),
+                );
+              },
             ),
 
-            // Language Switcher
+            // Spacer to push the language dropdown to the end
             DropdownButtonHideUnderline(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Config.greyColor,
-                ), // Optional padding
-                child: DropdownButton<String>(
-                  icon: Image.asset(
-                    languages.firstWhere((lang) =>
-                        lang['language'] == selectedLanguage)['flag']!,
-                    width: 30,
-                    height: 30,
-                  ),
-                  focusColor: Config.greyColor,
-                  items: languages.map((language) {
-                    return DropdownMenuItem<String>(
-                      value: language['language'],
-                      child: Row(
-                        children: [
-                          Image.asset(
-                            language['flag']!,
-                            width: 30,
-                            height: 30,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(language['language']!),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (newValue) {
-                    setState(() {
-                      selectedLanguage = newValue!;
-                    });
-                    // Logic to change language can be added here
-                  },
+              child: DropdownButton<String>(
+                icon: Image.asset(
+                  languages.firstWhere(
+                      (lang) => lang['language'] == selectedLanguage)['flag']!,
+                  width: 25,
+                  height: 25,
                 ),
+                focusColor: Config.whiteColor,
+                dropdownColor: Config.whiteColor,
+                iconDisabledColor: Config.whiteColor,
+                iconEnabledColor: Config.whiteColor,
+                elevation: 0,
+                items: languages.map((language) {
+                  return DropdownMenuItem<String>(
+                    alignment: AlignmentDirectional.centerStart,
+                    value: language['language'],
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          language['flag']!,
+                          width: 20,
+                          height: 20,
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          language['code']!,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Config.darkColor,
+                            fontFamily: 'Montserrat-SemiBold',
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+                onChanged: (newValue) async {
+                  setState(() {
+                    selectedLanguage = newValue!;
+                  });
+
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.setString('selectedLanguage', selectedLanguage);
+
+                  // Map language name to code
+                  String languageCode = 'rw';
+                  if (selectedLanguage == 'French') {
+                    languageCode = 'fr';
+                  } else if (selectedLanguage == 'Kinyarwanda') {
+                    languageCode = 'rw';
+                  } else if (selectedLanguage == 'Swahili') {
+                    languageCode = 'sw';
+                  } else if (selectedLanguage == 'English') {
+                    languageCode = 'en';
+                  }
+                  await LocalizationService().loadLanguage(languageCode);
+
+                  // Fetch data based on the selected language
+                  await _fetchDataBasedOnLanguage();
+
+                  // Rebuild the current state to reflect the language change
+                  setState(() {});
+                },
               ),
             ),
           ],
         ),
-        backgroundColor: Config.greyColor,
-        surfaceTintColor: Config.greyColor,
+        backgroundColor: Config.whiteColor,
+        surfaceTintColor: Config.whiteColor,
       ),
 
       body: PageView(
@@ -188,6 +213,7 @@ class _MainLayoutState extends State<MainLayout> {
           HomeScreen(),
         ],
       ),
+
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: Config.greyColor,
@@ -218,30 +244,30 @@ class _MainLayoutState extends State<MainLayout> {
             showSelectedLabels: true,
             elevation: 5.0,
             selectedFontSize: 10,
-            items: const <BottomNavigationBarItem>[
+            items: <BottomNavigationBarItem>[
               BottomNavigationBarItem(
-                icon: Icon(Icons.home_filled),
-                label: 'Home',
+                icon: const Icon(Icons.home_filled),
+                label: LocalizationService().translate('home'),
                 backgroundColor: Config.whiteColor,
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.category_sharp),
-                label: 'Categories',
+                icon: const Icon(Icons.category_sharp),
+                label: LocalizationService().translate('categories'),
                 backgroundColor: Config.whiteColor,
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.video_collection_outlined),
-                label: 'Sermons',
+                icon: const Icon(Icons.video_collection_outlined),
+                label: LocalizationService().translate('sermons'),
                 backgroundColor: Config.whiteColor,
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.audiotrack),
-                label: 'Audio Book',
+                icon: const Icon(Icons.audiotrack),
+                label: LocalizationService().translate('audioBooks'),
                 backgroundColor: Config.whiteColor,
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.settings),
-                label: 'Settings',
+                icon: const Icon(Icons.settings),
+                label: LocalizationService().translate('settings'),
                 backgroundColor: Config.whiteColor,
               ),
             ],

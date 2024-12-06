@@ -1,152 +1,208 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:precious/API/api_service.dart';
-import 'package:provider/provider.dart';
-import 'package:precious/providers/app_provider.dart';
-import 'package:precious/src/static_images.dart';
+import 'package:precious/providers/sermons_provider.dart';
+import 'package:precious/screens/playlist_videos_screen.dart';
 import 'package:precious/utils/config.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 class VideoCollectionScreen extends StatefulWidget {
-  const VideoCollectionScreen({super.key});
+  final int pastorId;
+  final String pastorName;
+  final String pastorBio;
+  final String imageUrl;
+
+  const VideoCollectionScreen({
+    super.key,
+    required this.pastorId,
+    required this.pastorName,
+    required this.pastorBio,
+    required this.imageUrl,
+  });
 
   @override
-  State<VideoCollectionScreen> createState() => _VideoCollectionScreenState();
+  _VideoCollectionScreenState createState() => _VideoCollectionScreenState();
 }
 
 class _VideoCollectionScreenState extends State<VideoCollectionScreen> {
-  Map<String, dynamic> user = {};
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    fetchSermons();
+    _loadData();
   }
 
-  Future<void> _loadUserData() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final userData = prefs.getString('user_data');
-    if (userData != null) {
-      setState(() {
-        user = Map<String, dynamic>.from(jsonDecode(userData));
-      });
-    } else {
-      Navigator.pushNamed(context, 'login');
-    }
+  Future<void> fetchSermons() async {
+    await Provider.of<SermonsProvider>(context, listen: false)
+        .getSermons(context, widget.pastorId);
   }
+
+  // Simulate data fetching and update the loading state
+  Future<void> _loadData() async {
+    // isLoading = true;
+    await Future.delayed(const Duration(seconds: 1));
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  // String formatDuration(Duration duration) {
+  //   String twoDigits(int n) => n.toString().padLeft(2, '0');
+  //   final minutes = twoDigits(duration.inMinutes);
+  //   final seconds = twoDigits(duration.inSeconds % 60);
+  //   return "$minutes:$seconds";
+  // }
 
   @override
   Widget build(BuildContext context) {
-    Config().init(context);
-    final videos = [
-      {
-        "id": 1,
-        "video_title":
-            "1 The BluePrint Earth\u0027s Final Movie PPT English version",
-        "video_url": "https:\/\/www.youtube.com\/watch?v=crmQ6O4rQfE"
-      },
-      {
-        "id": 2,
-        "video_title": "2 Ivor Myers Story of The Bible with PPT",
-        "video_url": "https:\/\/www.youtube.com\/watch?v=wonZKBKaMVc"
-      },
-      {
-        "id": 3,
-        "video_title":
-            "3 \u201cThe Sanctuary \u0026 the Image of the Beast\u201d Ivor Myers 3ABN Winter Camp Meeting 2020",
-        "video_url": "https:\/\/www.youtube.com\/watch?v=udiTxfx_UEA"
-      }
-    ]; //Provider.of<AppProvider>(context).videos;
+    final videoPlayList = Provider.of<SermonsProvider>(context).sermons;
+
     return Scaffold(
-        backgroundColor: Config.greyColor,
-        //if subjects is empty, then return progress indicator
-        body: videos.isNotEmpty
-            ? Padding(
-                padding: const EdgeInsets.only(
-                  left: 15.0,
-                  right: 15.0,
-                  bottom: 5.0,
-                ),
-                child: SafeArea(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        const SizedBox(height: 15.0),
-                        WelcomeCard(),
-                        const SizedBox(height: 15.0),
-                        Column(
+      backgroundColor: Config.greyColor,
+      appBar: AppBar(
+        backgroundColor: Config.whiteColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Config.darkColor,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // First Container with White Background
+            Container(
+              decoration: BoxDecoration(
+                color: Config.primaryColor,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          image: DecorationImage(
+                            image: NetworkImage(widget.imageUrl),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.pastorName,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontFamily: 'Montserrat-SemiBold',
+                              color: Config.whiteColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  widget.pastorBio.isNotEmpty
+                      ? Column(
                           children: [
-                            Center(
-                              child: ResponsiveGrid(videos: videos),
+                            const SizedBox(height: 20),
+                            RichText(
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: widget.pastorBio,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Config.whiteColor,
+                                      fontFamily: 'Montserrat-Regular',
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         )
-                      ],
-                    ),
+                      : const SizedBox.shrink(),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            isLoading
+                ? ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: 5, // Placeholder count
+                    itemBuilder: (context, index) => shimmerVideoPlayList(),
+                  )
+                : ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: videoPlayList.length,
+                    itemBuilder: (context, index) {
+                      final video = videoPlayList[index];
+                      return videoPlayListCard(
+                        video['title'],
+                        video['id'],
+                      );
+                    },
                   ),
-                ),
-              )
-            : const Center(
-                child: CircularProgressIndicator(),
-              ));
-  }
-}
-
-// welcome card
-class WelcomeCard extends StatefulWidget {
-  const WelcomeCard({super.key});
-
-  @override
-  State<WelcomeCard> createState() => _WelcomeCardState();
-}
-
-class _WelcomeCardState extends State<WelcomeCard> {
-  String title = "";
-  String msg = "";
-
-  @override
-  void initState() {
-    super.initState();
-    msg = 'Precious Present Truth Video Collections';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Config.primaryColor,
-        borderRadius: BorderRadius.circular(10.0),
+          ],
+        ),
       ),
-      child: Card(
-        elevation: 0.0,
-        // shape: RoundedRectangleBorder(
-        //   borderRadius: BorderRadius.circular(10.0),
-        // ),
-        color: Colors.transparent,
+    );
+  }
+
+  Widget shimmerVideoPlayList() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5.0),
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
         child: Padding(
-          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+          padding:
+              const EdgeInsets.only(left: 0, top: 0, bottom: 0, right: 8.0),
           child: Row(
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 8.0),
-                    Text(
-                      msg,
-                      style: const TextStyle(
-                        fontSize: 16.0,
-                        color: Config.whiteColor,
-                        fontFamily: 'Raleway-Regular',
-                      ),
-                    ),
-                    const SizedBox(height: 8.0),
-                  ],
-                ),
+              Container(
+                height: 50,
+              ),
+              const SizedBox(width: 10.0),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 100,
+                    height: 12,
+                    color: Colors.grey[300],
+                  ),
+                  const SizedBox(height: 5.0),
+                  Container(
+                    width: 80,
+                    height: 12,
+                    color: Colors.grey[300],
+                  ),
+                ],
+              ),
+              const Spacer(),
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.grey, // Adjusted for shimmer
+                size: 25.0,
               ),
             ],
           ),
@@ -154,100 +210,62 @@ class _WelcomeCardState extends State<WelcomeCard> {
       ),
     );
   }
-}
 
-class ResponsiveGrid extends StatelessWidget {
-  final List<dynamic> videos;
-
-  const ResponsiveGrid({super.key, required this.videos});
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        int crossAxisCount = getCrossAxisCount(constraints.maxWidth);
-        return GridView.builder(
-            shrinkWrap: true,
-            physics:
-                const NeverScrollableScrollPhysics(), // Prevent GridView from scrolling independently
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              crossAxisSpacing: 10.0,
-              mainAxisSpacing: 10.0,
-              childAspectRatio: 0.75,
+  Widget videoPlayListCard(String title, int playListId) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5.0),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PlayListVideosScreen(
+                title: title,
+                playListId: playListId,
+              ),
             ),
-            itemCount: videos.length,
-            itemBuilder: (context, index) {
-              if (videos[index]['id'] != null) {
-                final video = videos[index];
-                final videoUrl = video['video_url'];
-                final videoTitle = video['video_title'];
-                final videoId = video['id'];
-                return VideoCard(
-                  id: videoId,
-                  videoTitle: videoTitle,
-                  videoUrl: videoUrl,
-                );
-              }
-              ;
-            });
-      },
-    );
-  }
-
-  int getCrossAxisCount(double width) {
-    if (width >= 1200) return 8;
-    if (width >= 992) return 6;
-    if (width >= 768) return 4;
-    if (width >= 576) return 3;
-    return 2;
-  }
-}
-
-class VideoCard extends StatefulWidget {
-  final int id;
-  final String videoTitle;
-  final String videoUrl;
-
-  const VideoCard({
-    super.key,
-    required this.id,
-    required this.videoTitle,
-    required this.videoUrl,
-  });
-
-  @override
-  State<VideoCard> createState() => _VideoCardState();
-}
-
-class _VideoCardState extends State<VideoCard> {
-  late YoutubePlayerController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    // Extract the video ID from the URL and initialize the player
-    final videoId = YoutubePlayer.convertUrlToId(widget.videoUrl);
-    _controller = YoutubePlayerController(
-      initialVideoId: videoId!,
-      flags: const YoutubePlayerFlags(
-        autoPlay: false,
-        mute: false,
-        controlsVisibleAtStart: true,
+          );
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          padding:
+              const EdgeInsets.only(left: 0, top: 0, bottom: 0, right: 8.0),
+          child: Row(
+            children: [
+              Container(
+                height: 50,
+              ),
+              const SizedBox(width: 20.0),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 230,
+                    //height: 40.0,
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        color: Color.fromARGB(255, 0, 0, 0),
+                        fontFamily: 'Montserrat-SemiBold',
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: Config.primaryColor,
+                size: 18.0,
+              ),
+            ],
+          ),
+        ),
       ),
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-        height: 200,
-        child: Container(
-          height: 150, // Adjust this value to control the video player height
-          child: YoutubePlayer(
-            controller: _controller,
-            showVideoProgressIndicator: false,
-          ),
-        ));
   }
 }

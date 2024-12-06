@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:precious/API/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,11 +6,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AppProvider with ChangeNotifier {
   final ApiService _apiService = ApiService();
 
-  List<dynamic> _videos = [];
-  List<dynamic> get videos => _videos;
+  List<dynamic> _mostReadBooks = [];
+  List<dynamic> get mostReadBooks => _mostReadBooks;
 
-  List<dynamic> _subjects = [];
-  List<dynamic> get subjects => _subjects;
+  List<dynamic> _newReleasedBooks = [];
+  List<dynamic> get newReleasedBooks => _newReleasedBooks;
 
   List<dynamic> _audios = [];
   List<dynamic> get audios => _audios;
@@ -34,23 +33,8 @@ class AppProvider with ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? videosString = prefs.getString('videos');
     if (videosString != null) {
-      _subjects = jsonDecode(videosString);
+      _mostReadBooks = jsonDecode(videosString);
       notifyListeners();
-    }
-  }
-
-  void setVideos(List<dynamic> newVideos) {
-    _videos = newVideos;
-    notifyListeners();
-    _saveVideosToPrefs(newVideos); // Save to shared preferences
-  }
-
-  Future<void> getAllVideos() async {
-    try {
-      final videos = await ApiService().getVideos();
-      setVideos(videos);
-    } catch (e) {
-      print('Error fetching Videos: $e');
     }
   }
 
@@ -72,7 +56,7 @@ class AppProvider with ChangeNotifier {
   void setAudios(List<dynamic> newAudios) {
     _audios = newAudios;
     notifyListeners();
-    _saveAudiosToPrefs(newAudios); // Save to shared preferences
+    _saveAudiosToPrefs(newAudios);
   }
 
   Future<void> getAllAudios() async {
@@ -80,123 +64,83 @@ class AppProvider with ChangeNotifier {
       final audios = await ApiService().getAudioBook();
       setAudios(audios);
     } catch (e) {
-      print('Error fetching Videos: $e');
+      print('Error fetching Audios: $e');
     }
   }
 
-  Future<void> _saveSubjectsToPrefs(List<dynamic> subjects) async {
+  // MOST READ BOOKS
+  Future<void> _saveMostReadBooksToPrefs(List<dynamic> mostReadBooks) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('subjects', jsonEncode(subjects));
+    await prefs.setString('mostReadBooks', jsonEncode(mostReadBooks));
   }
 
-  Future<void> _loadSubjectsFromPrefs() async {
+  Future<void> _loadMostReadBooksFromPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? subjectsString = prefs.getString('subjects');
-    if (subjectsString != null) {
-      _subjects = jsonDecode(subjectsString);
+    String? _mostReadBooksString = prefs.getString('_mostReadBooks');
+    if (_mostReadBooksString != null) {
+      _mostReadBooks = jsonDecode(_mostReadBooksString);
       notifyListeners();
     }
   }
 
-  void setSubjects(List<dynamic> newSubjects) {
-    _subjects = newSubjects;
+  void setMostReadBooks(List<dynamic> newMostReadBooks) {
+    _mostReadBooks = newMostReadBooks;
     notifyListeners();
-    _saveSubjectsToPrefs(newSubjects); // Save to shared preferences
+    _saveMostReadBooksToPrefs(newMostReadBooks);
   }
 
-  Future<void> getAllSubjects() async {
+  Future<void> getMostReadBooks() async {
     try {
-      final subjects = await ApiService().getSubjects();
-      setSubjects(subjects);
+      // Fetch the selected language from SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? selectedLanguage =
+          prefs.getString('selectedLanguage') ?? 'Kinyarwanda';
+
+      // Pass the selected language to the API call
+      final mostReadBooks =
+          await ApiService().getMostReadBooksAPI(language: selectedLanguage);
+      setMostReadBooks(mostReadBooks);
     } catch (e) {
-      print('Error fetching subjects: $e');
+      print('Error fetching Most Read Books: $e');
     }
   }
 
-  /* 
-  * User Token 
-  */
-
-  // save user auth token to shared preference
-  Future<void> _saveUserTokenToPrefs(String userToken) async {
+  // NEW RELEASED BOOKS
+  Future<void> _saveNewReleasedBooksToPrefs(
+      List<dynamic> newReleasedBooks) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('user_auth_token', userToken);
+    await prefs.setString('newReleasedBooks', jsonEncode(newReleasedBooks));
   }
 
-  // load user auth token to shared preference
-  Future<void> _loadUserTokenFromPrefs() async {
+  Future<void> _loadNewReleasedBooksFromPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userTokenString = prefs.getString('user_auth_token');
-    if (userTokenString != null) {
-      _userToken = jsonDecode(userTokenString);
+    String? _newReleasedBooksString = prefs.getString('_newReleasedBooks');
+    if (_newReleasedBooksString != null) {
+      _newReleasedBooks = jsonDecode(_newReleasedBooksString);
       notifyListeners();
     }
   }
 
-  void setUserToken(String newUserToken) {
-    _userToken = newUserToken;
+  void setNewReleasedBooks(List<dynamic> newReleasedBooks) {
+    _newReleasedBooks = newReleasedBooks;
     notifyListeners();
-    _saveUserTokenToPrefs(newUserToken);
+    _saveNewReleasedBooksToPrefs(newReleasedBooks);
   }
 
-  Future<dynamic> getUserToken(String username, String password) async {
+  Future<void> getNewReleasedBooks() async {
     try {
-      final token = await ApiService().getToken(username, password);
-      setUserToken(token['jwt']);
+      // Fetch the selected language from SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? selectedLanguage =
+          prefs.getString('selectedLanguage') ?? 'Kinyarwanda';
+
+      // Pass the selected language to the API call
+      final newReleasedBooks =
+          await ApiService().getNewReleasedBooksAPI(language: selectedLanguage);
+      setNewReleasedBooks(newReleasedBooks);
     } catch (e) {
-      print('Error fetching user token: $e');
+      print('Error fetching New Released Books: $e');
     }
-  }
-
-  /* 
-  * User Data 
-  */
-
-  // save user auth Data to shared preference
-  Future<void> _saveUserDataToPrefs(Map<String, dynamic> userData) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('user_data', jsonEncode(userData));
-  }
-
-  Future<void> _loadUserDataFromPrefs() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userDataString = prefs.getString('user_data');
-    if (userDataString != null) {
-      _userData = jsonDecode(userDataString);
-      notifyListeners();
-    }
-  }
-
-  void setUserData(Map<String, dynamic> newUserData) {
-    _userData = newUserData;
-    notifyListeners();
-    _saveUserDataToPrefs(newUserData);
-  }
-
-  Future<dynamic> getUserData(String token) async {
-    try {
-      final data = await ApiService().getUserData(token);
-      setUserData(data);
-    } catch (e) {
-      print('Error fetching user data: $e');
-    }
-  }
-
-  bool get isLogin {
-    return _isLogin;
-  }
-
-  Map<String, dynamic> get getUser {
-    return user;
-  }
-
-//when login success, update the status
-  void loginSuccess(Map<String, dynamic> userData) {
-    _isLogin = true;
-
-    user = userData;
-
-    notifyListeners();
   }
 
   AppProvider() {
@@ -206,8 +150,8 @@ class AppProvider with ChangeNotifier {
     //_loadQuestionsFromPrefs();
 
     // Fetch data from the API
-    getAllSubjects();
-    getAllVideos();
+    getMostReadBooks();
+    getNewReleasedBooks();
     getAllAudios();
   }
 }

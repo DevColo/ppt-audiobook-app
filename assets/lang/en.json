@@ -1,0 +1,25 @@
+{
+    "appTitle": "PPT App",
+    "home": "Home",
+    "categories": "Categories",
+    "sermons": "Sermons",
+    "audioBooks": "Audio Books",
+    "settings": "Settings",
+    "mostReadBooks": "Most Read Books",
+    "newReleasedBooks": "New Released Books",
+    "seeAll": "See All",
+    "pastors": "Pastors",
+    "Leadership": "Leadership",
+    "Church": "Church",
+    "Education": "Education",
+    "Youth": "Youth",
+    "Loyalty": "Loyalty",
+    "Love": "Love",
+    "Download Book": "Download Book",
+    "Download Audio": "Download Audio",
+    "Share": "Share",
+    "Search": "Search",
+    "searchPlaceholder": "Search by title, author or category",
+    "searchResultText": "The search results will display here"
+  }
+  

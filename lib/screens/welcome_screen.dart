@@ -1,8 +1,9 @@
-import 'package:precious/src/static_images.dart';
-import 'package:precious/utils/config.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:provider/provider.dart';
+import 'package:precious/providers/collections_provider.dart';
+import 'package:precious/utils/config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -11,18 +12,12 @@ class WelcomeScreen extends StatefulWidget {
   State<WelcomeScreen> createState() => _WelcomeScreenState();
 }
 
-// page loader
-const spinkit = SpinKitThreeBounce(
-  color: Config.primaryColor,
-);
-
 class _WelcomeScreenState extends State<WelcomeScreen> {
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    // load for 3 secs
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
         setState(() {
@@ -32,17 +27,40 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     });
   }
 
+  // Helper function to map collection titles to image assets
+  String _getImageForTitle(String title) {
+    switch (title.toLowerCase()) {
+      case 'kinyarwanda':
+        return 'assets/images/kinyarwanda.png';
+      case 'english':
+        return 'assets/images/english.png';
+      case 'french':
+        return 'assets/images/french.png';
+      case 'kiswahili':
+        return 'assets/images/kiswahili.png';
+      default:
+        return 'assets/images/default.png';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // show the loader
-    if (_isLoading) {
+    final collectionsProvider = Provider.of<CollectionsProvider>(context);
+
+    // page loader
+    const spinkit = SpinKitSpinningLines(
+      color: Config.primaryColor,
+    );
+
+    // Show loader if data is still being fetched or screen is loading
+    if (_isLoading || collectionsProvider.collections.isEmpty) {
       return const Scaffold(
         body: Center(
           child: spinkit,
         ),
       );
     }
-    // render the content
+
     return Scaffold(
       backgroundColor: Config.whiteColor,
       body: SingleChildScrollView(
@@ -57,368 +75,65 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               children: [
                 const SizedBox(height: 50.0),
                 Image.asset(
-                  preciousLogo,
-                  scale: 0.05,
-                  alignment: Alignment.center,
+                  'assets/images/logo.png',
                   width: 210.0,
                 ),
-                const SizedBox(height: 1.0),
-                //const WelcomeTitleFirst(),
-                //const WelcomeTitleSecond(),
-                //const SizedBox(height: 25.0),
-                //const WelcomeSubTitle(),
                 const SizedBox(height: 60.0),
-                //const ManualSignInButton(),
-                const SizedBox(height: 20.0),
-                const EnglishButton(),
-                const SizedBox(height: 20.0),
-                const FrenchButton(),
-                const SizedBox(height: 20.0),
-                const KinyarwandaButton(),
-                const SizedBox(height: 20.0),
-                const SwahiliButton(),
-                const SizedBox(height: 20),
+                ...collectionsProvider.collections.map((collection) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        // Send the selected language to backend
+                        await collectionsProvider
+                            .selectLanguage(collection['title']);
+
+                        // Save the selected language to SharedPreferences
+                        SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        await prefs.setString(
+                            'selectedLanguage', collection['title']);
+
+                        // Navigate to the main screen
+                        Navigator.pushNamed(context, 'main');
+                      },
+                      style: ButtonStyle(
+                        backgroundColor:
+                            WidgetStateProperty.all(Config.greyColor),
+                        fixedSize: WidgetStateProperty.all(
+                          Size(Config.buttonNormalWidth,
+                              Config.buttonNormalHeight),
+                        ),
+                        elevation: WidgetStateProperty.all(0),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset(
+                            _getImageForTitle(collection['title']),
+                            height: 24,
+                          ),
+                          const SizedBox(width: 8),
+                          SizedBox(
+                            width: 140,
+                            child: Text(
+                              collection['title'],
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Config.darkColor,
+                                fontFamily: 'Montserrat-SemiBold',
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-// Welcome main title
-class WelcomeTitleFirst extends StatelessWidget {
-  const WelcomeTitleFirst({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 220,
-      child: Center(
-        child: RichText(
-          textAlign: TextAlign.center,
-          text: TextSpan(
-            style: DefaultTextStyle.of(context).style,
-            children: const <TextSpan>[
-              TextSpan(
-                text: 'Find Your ',
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Config.darkColor,
-                  fontWeight: FontWeight.w800,
-                  fontFamily: 'Montserrat-SemiBold',
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// Welcome main title
-class WelcomeTitleSecond extends StatelessWidget {
-  const WelcomeTitleSecond({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 220,
-      child: Center(
-        child: RichText(
-          textAlign: TextAlign.center,
-          text: TextSpan(
-            style: DefaultTextStyle.of(context).style,
-            children: const <TextSpan>[
-              TextSpan(
-                text: 'Incredible Soulmate',
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Config.darkColor,
-                  fontWeight: FontWeight.w800,
-                  fontFamily: 'Montserrat-SemiBold',
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// Welcome sub title
-class WelcomeSubTitle extends StatelessWidget {
-  const WelcomeSubTitle({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 300,
-      child: Center(
-        child: RichText(
-          textAlign: TextAlign.center,
-          text: TextSpan(
-            style: DefaultTextStyle.of(context).style,
-            children: const <TextSpan>[
-              TextSpan(
-                text:
-                    'Favroite Meet, your companion for meaningful connection.',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Color.fromARGB(255, 120, 120, 120),
-                  fontWeight: FontWeight.w500,
-                  fontFamily: 'OoohBaby',
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// sign up button
-class SignUp extends StatelessWidget {
-  const SignUp({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 300,
-      child: Center(
-        child: RichText(
-          textAlign: TextAlign.center,
-          text: TextSpan(
-            style: DefaultTextStyle.of(context).style,
-            children: <TextSpan>[
-              const TextSpan(
-                text: "You don't have an account ? ",
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Color.fromARGB(255, 0, 0, 0),
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'Montserrat',
-                ),
-              ),
-              TextSpan(
-                text: 'Sign up',
-                recognizer: TapGestureRecognizer()
-                  ..onTap = () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //       builder: (context) => const RegisterScreen()),
-                    // );
-                  },
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: Config.primaryColor,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'Montserrat',
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// Manual Sign In Button
-// class ManualSignInButton extends StatelessWidget {
-//   const ManualSignInButton({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return ElevatedButton(
-//       onPressed: () {
-//         // Navigator.push(
-//         //   context,
-//         //   MaterialPageRoute(builder: (context) => const LoginScreen()),
-//         // );
-//       },
-//       style: ButtonStyle(
-//         backgroundColor: WidgetStateProperty.all(Config.primaryColor),
-//         fixedSize: WidgetStateProperty.all(
-//             Size(Config.buttonNormalWidth, Config.buttonNormalHeight)),
-//         elevation: WidgetStateProperty.all(0),
-//       ),
-//       child: const Text(
-//         "Find Someone",
-//         style: TextStyle(
-//           fontSize: 13,
-//           color: Color.fromARGB(255, 255, 255, 255),
-//           fontFamily: 'Montserrat-SemiBold',
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// English Button
-class EnglishButton extends StatelessWidget {
-  const EnglishButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        Navigator.pushNamed(context, 'main');
-      },
-      style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.all(Config.greyColor),
-        fixedSize: WidgetStateProperty.all(
-            Size(Config.buttonNormalWidth, Config.buttonNormalHeight)),
-        elevation: WidgetStateProperty.all(0),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Image.asset(
-            engImg,
-            height: 22,
-          ),
-          const SizedBox(width: 8),
-          const SizedBox(
-            width: 140,
-            child: Text(
-              "English Language",
-              style: TextStyle(
-                fontSize: 13,
-                color: Config.darkColor,
-                fontFamily: 'Montserrat-SemiBold',
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// French Button
-class FrenchButton extends StatelessWidget {
-  const FrenchButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        Navigator.pushNamed(context, 'main');
-      },
-      style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.all(Config.greyColor),
-        fixedSize: WidgetStateProperty.all(
-            Size(Config.buttonNormalWidth, Config.buttonNormalHeight)),
-        elevation: WidgetStateProperty.all(0),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Image.asset(
-            frImg,
-            height: 22,
-          ),
-          const SizedBox(width: 8),
-          const SizedBox(
-            width: 143,
-            child: Text(
-              "French Language",
-              style: TextStyle(
-                fontSize: 13,
-                color: Config.darkColor,
-                fontFamily: 'Montserrat-SemiBold',
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Kinyarwanda Button
-class KinyarwandaButton extends StatelessWidget {
-  const KinyarwandaButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        Navigator.pushNamed(context, 'main');
-      },
-      style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.all(Config.greyColor),
-        fixedSize: WidgetStateProperty.all(
-            Size(Config.buttonNormalWidth, Config.buttonNormalHeight)),
-        elevation: WidgetStateProperty.all(0),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.asset(
-            rwImg,
-            height: 24,
-          ),
-          const SizedBox(width: 8),
-          const SizedBox(
-            width: 140,
-            child: Text(
-              "Kinyarwanda Language",
-              style: TextStyle(
-                fontSize: 13,
-                color: Config.darkColor,
-                fontFamily: 'Montserrat-SemiBold',
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Swahili Button
-class SwahiliButton extends StatelessWidget {
-  const SwahiliButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        Navigator.pushNamed(context, 'main');
-      },
-      style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.all(Config.greyColor),
-        fixedSize: WidgetStateProperty.all(
-            Size(Config.buttonNormalWidth, Config.buttonNormalHeight)),
-        elevation: WidgetStateProperty.all(0),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.asset(
-            swImg,
-            height: 24,
-          ),
-          const SizedBox(width: 8),
-          const SizedBox(
-            width: 140,
-            child: Text(
-              "Swahili Language",
-              style: TextStyle(
-                fontSize: 13,
-                color: Config.darkColor,
-                fontFamily: 'Montserrat-SemiBold',
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
