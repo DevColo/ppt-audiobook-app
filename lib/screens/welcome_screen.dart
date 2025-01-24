@@ -38,6 +38,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         return 'assets/images/french.png';
       case 'kiswahili':
         return 'assets/images/kiswahili.png';
+      case 'lingala':
+        return 'assets/images/lingala.png';
       default:
         return 'assets/images/default.png';
     }

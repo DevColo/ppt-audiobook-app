@@ -89,30 +89,15 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: OoohBaby
-      fonts:
-        - asset: assets/fonts/OoohBaby-Regular.ttf
     - family: Montserrat
       fonts:
         - asset: assets/fonts/Montserrat/Montserrat-VariableFont_wght.ttf
     - family: Montserrat-SemiBold
       fonts:
-        - asset: assets/fonts/Montserrat/static/Montserrat-SemiBold.ttf
+        - asset: assets/fonts/Montserrat/Montserrat-SemiBold.ttf
     - family: Montserrat-Regular
       fonts:
-        - asset: assets/fonts/Montserrat/static/Montserrat-Regular.ttf
-    - family: Raleway
-      fonts:
-        - asset: assets/fonts/Raleway/Raleway-VariableFont_wght.ttf
-    - family: Raleway-SemiBold
-      fonts:
-        - asset: assets/fonts/Raleway/static/Raleway-SemiBold.ttf
-    - family: Raleway-Regular
-      fonts:
-        - asset: assets/fonts/Raleway/static/Raleway-Regular.ttf
-    - family: EBGaramond-Regular
-      fonts:
-        - asset: assets/fonts/EB_Garamond/static/EBGaramond-Regular.ttf
+        - asset: assets/fonts/Montserrat/Montserrat-Regular.ttf
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package

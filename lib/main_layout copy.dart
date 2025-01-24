@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:precious/providers/app_provider.dart';
 import 'package:precious/providers/audio_books_provider.dart';
@@ -88,12 +86,7 @@ class _MainLayoutState extends State<MainLayout> {
       languageCode = 'sw';
     } else if (selectedLanguage == 'English') {
       languageCode = 'en';
-    } else if (selectedLanguage == 'Lingala') {
-      languageCode = 'lg';
-    } else if (selectedLanguage == 'Tshiluba') {
-      languageCode = 'ts';
     }
-
     await LocalizationService().loadLanguage(languageCode);
     await _fetchDataBasedOnLanguage();
   }
@@ -115,150 +108,100 @@ class _MainLayoutState extends State<MainLayout> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
+      key: _scaffoldKey, // Assign the key to Scaffold
       appBar: AppBar(
-        actions: [
-          // Search Icon
-          IconButton(
-            icon: const Icon(Icons.search, size: 24.0),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SearchScreen()),
-              );
-            },
-          ),
-        ],
-        backgroundColor: Config.whiteColor,
-        surfaceTintColor: Config.whiteColor,
-      ),
-
-      // Navigation Drawer
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Config.primaryColor,
-              ),
-              child: Text(
-                'Precious Present Truth Audiobook',
-                style: TextStyle(
-                  fontFamily: 'Montserrat-SemiBold',
-                  color: Config.whiteColor,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-            // Navigation Items
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: Text(LocalizationService().translate('home')),
-              onTap: () {
-                _pageController.jumpToPage(0);
-                Navigator.of(context).pop();
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.download),
-              title: Text(LocalizationService().translate('downloads')),
-              onTap: () {
-                _pageController.jumpToPage(1);
-                Navigator.of(context).pop();
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.video_collection_outlined),
-              title: Text(LocalizationService().translate('myPlayList')),
-              onTap: () {
-                _pageController.jumpToPage(2);
-                Navigator.of(context).pop();
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.search),
-              title:
-                  Text(LocalizationService().translate('searchBookPreacher')),
-              onTap: () {
-                _pageController.jumpToPage(3);
-                Navigator.of(context).pop();
-              },
-            ),
-            const Divider(),
-            // Language Selection
-            ListTile(
-              leading: const Icon(Icons.language),
-              title: Text(LocalizationService().translate('changeLanguage')),
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text(
-                        LocalizationService().translate('selectLanguage'),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontFamily: 'Montserrat-SemiBold',
-                          color: Config.darkColor,
-                        ),
-                      ),
-                      content: SingleChildScrollView(
-                        child: Column(
-                          children: languages.map((language) {
-                            return ListTile(
-                              leading: Image.asset(
-                                language['flag']!,
-                                width: 30,
-                                height: 30,
-                              ),
-                              title: Text(language['language']!),
-                              onTap: () async {
-                                setState(() {
-                                  selectedLanguage = language['language']!;
-                                });
-
-                                final prefs =
-                                    await SharedPreferences.getInstance();
-                                await prefs.setString(
-                                    'selectedLanguage', selectedLanguage);
-
-                                String languageCode = language['code']!;
-                                await LocalizationService()
-                                    .loadLanguage(languageCode);
-
-                                // Fetch data based on the selected language
-                                await _fetchDataBasedOnLanguage();
-
-                                // Close the dialog and drawer
-                                Navigator.of(context).pop();
-                                Navigator.of(context).pop();
-                              },
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    );
-                  },
+        automaticallyImplyLeading: false,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment
+              .spaceBetween, // Space between start and end icons
+          children: [
+            // Search Icon at Start
+            IconButton(
+              icon: const Icon(Icons.search, size: 24.0),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SearchScreen()),
                 );
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: Text(LocalizationService().translate('settings')),
-              onTap: () {
-                Navigator.pushNamed(context, 'settings');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: Text(LocalizationService().translate('exit')),
-              onTap: () {
-                exit(0);
-              },
+
+            // Spacer to push the language dropdown to the end
+            DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                icon: Image.asset(
+                  languages.firstWhere(
+                      (lang) => lang['language'] == selectedLanguage)['flag']!,
+                  width: 25,
+                  height: 25,
+                ),
+                focusColor: Config.whiteColor,
+                dropdownColor: Config.whiteColor,
+                iconDisabledColor: Config.whiteColor,
+                iconEnabledColor: Config.whiteColor,
+                elevation: 0,
+                items: languages.map((language) {
+                  return DropdownMenuItem<String>(
+                    alignment: AlignmentDirectional.centerStart,
+                    value: language['language'],
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          language['flag']!,
+                          width: 20,
+                          height: 20,
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          language['code']!,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Config.darkColor,
+                            fontFamily: 'Montserrat-SemiBold',
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+                onChanged: (newValue) async {
+                  setState(() {
+                    selectedLanguage = newValue!;
+                  });
+
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.setString('selectedLanguage', selectedLanguage);
+
+                  // Map language name to code
+                  String languageCode = 'rw';
+                  if (selectedLanguage == 'French') {
+                    languageCode = 'fr';
+                  } else if (selectedLanguage == 'Kinyarwanda') {
+                    languageCode = 'rw';
+                  } else if (selectedLanguage == 'Swahili') {
+                    languageCode = 'sw';
+                  } else if (selectedLanguage == 'English') {
+                    languageCode = 'en';
+                  } else if (selectedLanguage == 'Lingala') {
+                    languageCode = 'lg';
+                  } else if (selectedLanguage == 'Tshiluba') {
+                    languageCode = 'ts';
+                  }
+                  await LocalizationService().loadLanguage(languageCode);
+
+                  // Fetch data based on the selected language
+                  await _fetchDataBasedOnLanguage();
+
+                  // Rebuild the current state to reflect the language change
+                  setState(() {});
+                },
+              ),
             ),
           ],
         ),
+        backgroundColor: Config.whiteColor,
+        surfaceTintColor: Config.whiteColor,
       ),
 
       body: PageView(
@@ -274,6 +217,7 @@ class _MainLayoutState extends State<MainLayout> {
           CategoriesScreen(),
           SermonsScreen(),
           AudioBooksScreen(),
+          SettingsScreen(),
         ],
       ),
 
@@ -328,6 +272,11 @@ class _MainLayoutState extends State<MainLayout> {
               BottomNavigationBarItem(
                 icon: const Icon(Icons.audiotrack),
                 label: LocalizationService().translate('audioBooks'),
+                backgroundColor: Config.whiteColor,
+              ),
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.settings),
+                label: LocalizationService().translate('settings'),
                 backgroundColor: Config.whiteColor,
               ),
             ],

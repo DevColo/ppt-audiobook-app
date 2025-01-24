@@ -29,5 +29,10 @@
   "supportText": "Contactez-nous pour obtenir de l’aide et notre équipe se fera un plaisir de vous aider.",
   "callUs": "Appelez-nous",
   "emailUs": "Envoyez-nous un courriel",
-  "ourWebsite": "Visitez notre site Web"
+  "ourWebsite": "Visitez notre site Web",
+  "selectLanguage": "Sélectionner la langue",
+  "searchBookPreacher": "Trouver un livre ou un prédicateur",
+  "myPlayList": "Ma liste de lecture",
+  "downloads": "Télécharger",
+  "exit": "Sortie"
 }

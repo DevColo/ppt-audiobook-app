@@ -234,7 +234,7 @@ class _GetInTouchScreenState extends State<GetInTouchScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
-                    width: 200.0,
+                    width: 150.0,
                     child: Text(
                       LocalizationService().translate('emailUs'),
                       style: const TextStyle(
@@ -245,7 +245,7 @@ class _GetInTouchScreenState extends State<GetInTouchScreen> {
                     ),
                   ),
                   const SizedBox(
-                    width: 200.0,
+                    width: 150.0,
                     child: Text(
                       'info@preciouspresenttruth.org',
                       style: TextStyle(
@@ -298,7 +298,7 @@ class _GetInTouchScreenState extends State<GetInTouchScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
-                    width: 200.0,
+                    width: 150.0,
                     child: Text(
                       LocalizationService().translate('ourWebsite'),
                       style: const TextStyle(
@@ -309,7 +309,7 @@ class _GetInTouchScreenState extends State<GetInTouchScreen> {
                     ),
                   ),
                   const SizedBox(
-                    width: 200.0,
+                    width: 160.0,
                     child: Text(
                       'https://preciouspresenttruth.org',
                       style: TextStyle(
