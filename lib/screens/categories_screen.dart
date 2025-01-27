@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:precious/providers/categories_provider.dart';
+import 'package:precious/screens/category_screen.dart';
 import 'package:precious/utils/localization_service.dart';
 import 'package:provider/provider.dart';
 import 'package:precious/utils/config.dart';
@@ -26,11 +27,15 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     return Scaffold(
       backgroundColor: Config.greyColor,
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(
+          vertical: 1.0,
+          horizontal: 10.0,
+        ),
         child: Column(
           children: [
+            const SizedBox(height: 5.0),
             _buildHeading(),
-            const SizedBox(height: 20),
+            const SizedBox(height: 5.0),
             _buildCategoryGrid(categories),
           ],
         ),
@@ -40,13 +45,13 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   Widget _buildHeading() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      padding: const EdgeInsets.symmetric(horizontal: 6.0),
       child: Row(
         children: [
           Text(
             LocalizationService().translate('categories'),
             style: const TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontFamily: 'Montserrat-SemiBold',
               color: Config.darkColor,
             ),
@@ -97,6 +102,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           List<Color> gradientColors = _getGradientColors(icon);
 
           return _CategoryCard(
+            categoryID: category['id'],
             categoryName: LocalizationService().translate(category['title']),
             icon: icon,
             gradientColors: gradientColors,
@@ -138,7 +144,7 @@ class _CategoryChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 5.0),
       child: Chip(
         label: Text(label),
-        backgroundColor: Colors.white,
+        backgroundColor: Config.whiteColor,
         labelStyle: const TextStyle(
           color: Config.primaryColor,
           fontFamily: 'Montserrat-SemiBold',
@@ -152,11 +158,13 @@ class _CategoryChip extends StatelessWidget {
 }
 
 class _CategoryCard extends StatelessWidget {
+  final int categoryID;
   final String categoryName;
   final IconData icon;
   final List<Color> gradientColors;
 
   const _CategoryCard({
+    required this.categoryID,
     required this.categoryName,
     required this.icon,
     required this.gradientColors,
@@ -164,31 +172,44 @@ class _CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 100,
-      height: 100,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(
-          colors: gradientColors,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 25, color: Colors.white),
-          const SizedBox(height: 8.0),
-          Text(
-            categoryName,
-            style: const TextStyle(
-              color: Colors.white,
-              fontFamily: 'Montserrat-SemiBold',
-              fontSize: 10,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CategoryScreen(
+              categoryID: categoryID,
+              title: categoryName,
             ),
           ),
-        ],
+        );
+      },
+      child: Container(
+        width: 100,
+        height: 100,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            colors: gradientColors,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 25, color: Config.whiteColor),
+            const SizedBox(height: 8.0),
+            Text(
+              categoryName,
+              style: const TextStyle(
+                color: Config.whiteColor,
+                fontFamily: 'Montserrat-SemiBold',
+                fontSize: 10,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

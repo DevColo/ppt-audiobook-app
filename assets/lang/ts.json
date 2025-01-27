@@ -15,10 +15,10 @@
     "Youth": "Bantu Bakajikaji",
     "Loyalty": "Bukwâlâ",
     "Love": "Bulêndà",
-    "Download Book": "Kàndisha Mukanda",
-    "Download Audio": "Kàndisha Kulombola",
-    "Share": "Bàngula",
-    "Search": "Kukula",
+    "downloadBook": "Kàndisha Mukanda",
+    "downloadAudio": "Kàndisha Kulombola",
+    "share": "Bàngula",
+    "search": "Kukula",
     "searchPlaceholder": "Kukula udiibà kombo, mukanda o dikengèdi",
     "searchResultText": "Mishindà yòkukula mikapyàdi àwa",
     "support": "Bulùlù",
@@ -33,5 +33,8 @@
     "selectLanguage": "Pònà Lulàmù",
     "searchBookPreacher": "Kukula Mukanda o Kalala",
     "myPlayList": "Dibenga Dianyi",
-    "downloads": "Mishindà Yokàndisha"
+    "downloads": "Mishindà Yokàndisha",
+    "exit": "Kubuela",
+    "refresh": "Tshinishapya",
+    "noData": "Kadika kena"
 }

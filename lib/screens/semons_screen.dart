@@ -43,18 +43,22 @@ class _SermonsScreenState extends State<SermonsScreen> {
           ? buildSkeletonScreen() // Show skeleton while loading
           : pastors.isNotEmpty
               ? Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 1.0,
+                    horizontal: 10.0,
+                  ),
                   child: Column(
                     children: [
+                      const SizedBox(height: 5.0),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 6.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Text(
                               LocalizationService().translate('pastors'),
                               style: const TextStyle(
-                                fontSize: 16,
+                                fontSize: 14,
                                 fontFamily: 'Montserrat-SemiBold',
                                 color: Config.darkColor,
                               ),
@@ -62,6 +66,7 @@ class _SermonsScreenState extends State<SermonsScreen> {
                           ],
                         ),
                       ),
+                      const SizedBox(height: 2.0),
                       Expanded(
                         child: ListView.builder(
                           itemCount: pastors.length,
@@ -79,10 +84,8 @@ class _SermonsScreenState extends State<SermonsScreen> {
                     ],
                   ),
                 )
-              : const Center(
-                  child: Text(
-                    'No Data Found!', // Display when pastors list is empty
-                  ),
+              : Center(
+                  child: Text(LocalizationService().translate('noData')),
                 ),
     );
   }
@@ -174,7 +177,7 @@ class _SermonsScreenState extends State<SermonsScreen> {
               ),
               const SizedBox(width: 15),
               Text(
-                fullname,
+                _trimFullname(fullname),
                 style: const TextStyle(
                   color: Color.fromARGB(255, 0, 0, 0),
                   fontFamily: 'Montserrat-SemiBold',
@@ -190,4 +193,18 @@ class _SermonsScreenState extends State<SermonsScreen> {
       ),
     );
   }
+}
+
+// Helper method to process fullname
+String _trimFullname(String fullname) {
+  // Split the fullname into words
+  final words = fullname.split(' ');
+
+  // If more than two words, keep only the first two
+  if (words.length > 2) {
+    return '${words[0]} ${words[1]}';
+  }
+
+  // Otherwise, return the fullname as is
+  return fullname;
 }

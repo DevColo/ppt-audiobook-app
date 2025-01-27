@@ -16,6 +16,18 @@ class AudioBooksApi {
     }
   }
 
+  // Get Audio Books Per Language Category
+  Future<dynamic> getCategoryBooksAPI(
+      {required String language, required int categoryId}) async {
+    try {
+      final response =
+          await _dio.get('/api/get-category-books/$language/$categoryId');
+      return response.data;
+    } catch (e) {
+      throw Exception('Failed to load books: $e');
+    }
+  }
+
   // Get Book Details Per ID
   Future<dynamic> getBookAPI({required int bookId}) async {
     try {

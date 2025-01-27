@@ -80,7 +80,7 @@ class CategoriesProvider with ChangeNotifier {
   CategoriesProvider() {
     // Load data from shared preferences on initialization
     _loadCategoriesFromPrefs();
-    _loadLanguageFromPrefs(); // Load the selected language from prefs
+    _loadLanguageFromPrefs();
 
     // Fetch data from the API
     getAllCategories();

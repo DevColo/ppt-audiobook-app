@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:precious/providers/app_provider.dart';
 import 'package:precious/providers/audio_books_provider.dart';
+import 'package:precious/providers/categories_provider.dart';
+import 'package:precious/providers/collections_provider.dart';
 import 'package:precious/providers/sermons_provider.dart';
 import 'package:precious/screens/audio_books_screen.dart';
 import 'package:precious/screens/categories_screen.dart';
@@ -100,8 +102,9 @@ class _MainLayoutState extends State<MainLayout> {
 
   Future<void> _fetchDataBasedOnLanguage() async {
     final appProvider = Provider.of<AppProvider>(context, listen: false);
-    await appProvider.getMostReadBooks();
+    //await appProvider.getMostReadBooks();
     await appProvider.getNewReleasedBooks();
+    await appProvider.getPreachers();
 
     final sermonsProvider =
         Provider.of<SermonsProvider>(context, listen: false);
@@ -110,6 +113,14 @@ class _MainLayoutState extends State<MainLayout> {
     final audioProvider =
         Provider.of<AudioBooksProvider>(context, listen: false);
     await audioProvider.getAudioBooks();
+
+    final categoryProvider =
+        Provider.of<CategoriesProvider>(context, listen: false);
+    await categoryProvider.getAllCategories();
+
+    final collectionsProvider =
+        Provider.of<CollectionsProvider>(context, listen: false);
+    await collectionsProvider.getAllCollections();
   }
 
   @override
@@ -232,7 +243,6 @@ class _MainLayoutState extends State<MainLayout> {
 
                                 // Close the dialog and drawer
                                 Navigator.of(context).pop();
-                                Navigator.of(context).pop();
                               },
                             );
                           }).toList(),
@@ -248,6 +258,13 @@ class _MainLayoutState extends State<MainLayout> {
               title: Text(LocalizationService().translate('settings')),
               onTap: () {
                 Navigator.pushNamed(context, 'settings');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.refresh),
+              title: Text(LocalizationService().translate('refresh')),
+              onTap: () async {
+                await _fetchDataBasedOnLanguage();
               },
             ),
             ListTile(

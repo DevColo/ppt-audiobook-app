@@ -15,10 +15,10 @@
     "Youth": "Bilenge",
     "Loyalty": "Boyekoli",
     "Love": "Bolingo",
-    "Download Book": "Zwa Mokanda",
-    "Download Audio": "Zwa Sango ya Maloba",
-    "Share": "Délá",
-    "Search": "Koluka",
+    "downloadBook": "Zwa Mokanda",
+    "downloadAudio": "Zwa Sango ya Maloba",
+    "share": "Délá",
+    "search": "Koluka",
     "searchPlaceholder": "Luka na kombo, mokanda to likambo",
     "searchResultText": "Bino bikosangana kuna na biloko boluká awa",
     "support": "Lisungi",
@@ -34,5 +34,7 @@
     "searchBookPreacher": "Luka buku to Mosakoli",
     "myPlayList": "Liste ya ba nzembo na ngai",
     "downloads": "Ba téléchargements",
-    "exit": "Kobima"
+    "exit": "Kobima",
+    "refresh": "Kozongisa sika",
+    "noData": "Ba Données Ezwami Te"
 }

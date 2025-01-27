@@ -7,28 +7,6 @@ class ApiService {
 
   //final Dio _dio = Dio(BaseOptions(baseUrl: 'http://ppt.site'));
 
-  // Get video
-  Future<dynamic> getVideos() async {
-    try {
-      //final response = await _dio.get('/get-videos/apiv1');
-      //final response = await _dio.get('/jsonapi/node/subject');
-      // return response.data;
-    } catch (e) {
-      throw Exception('Failed to load subjects: $e');
-    }
-  }
-
-  // Get video
-  Future<dynamic> getAudioBook() async {
-    try {
-      // final response = await _dio.get('/get-audio-book/apiv1');
-      //final response = await _dio.get('/jsonapi/node/subject');
-      // return response.data;
-    } catch (e) {
-      throw Exception('Failed to load subjects: $e');
-    }
-  }
-
   // Get Most Read Books
   Future<dynamic> getMostReadBooksAPI({required String language}) async {
     try {
@@ -46,6 +24,16 @@ class ApiService {
       return response.data;
     } catch (e) {
       throw Exception('Failed to load new released books: $e');
+    }
+  }
+
+  // Get Preachers
+  Future<dynamic> getPreachersAPI({required String language}) async {
+    try {
+      final response = await _dio.get('/api/$language/preachers');
+      return response.data;
+    } catch (e) {
+      throw Exception('Failed to load preachers: $e');
     }
   }
 }

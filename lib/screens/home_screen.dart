@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:precious/providers/categories_provider.dart';
 import 'package:precious/screens/audio_screen.dart';
+import 'package:precious/screens/category_screen.dart';
+import 'package:precious/screens/semons_screen.dart';
+import 'package:precious/screens/video_collection_screen.dart';
 import 'package:precious/utils/localization_service.dart';
 import 'package:provider/provider.dart';
 import 'package:precious/providers/app_provider.dart';
@@ -34,26 +37,31 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     Config().init(context);
-    final mostReadBooks = Provider.of<AppProvider>(context).mostReadBooks;
+    //final mostReadBooks = Provider.of<AppProvider>(context).mostReadBooks;
+    final preachers = Provider.of<AppProvider>(context).preachers;
     final newReleasedBooks = Provider.of<AppProvider>(context).newReleasedBooks;
     final categories = Provider.of<CategoriesProvider>(context).categories;
 
     return Scaffold(
       backgroundColor: Config.greyColor,
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(
+          vertical: 1.0,
+          horizontal: 10.0,
+        ),
         child: SingleChildScrollView(
           child: Column(
             children: [
+              const SizedBox(height: 8.0),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                padding: const EdgeInsets.symmetric(horizontal: 6.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
                       LocalizationService().translate('categories'),
                       style: const TextStyle(
-                        fontSize: 14,
+                        fontSize: 12,
                         fontFamily: 'Montserrat-SemiBold',
                         color: Config.darkColor,
                       ),
@@ -61,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 2.0),
+              const SizedBox(height: .0),
               SizedBox(
                 height: 40,
                 child: isLoading
@@ -81,15 +89,58 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
               ),
               const SizedBox(height: 15.0),
+              // Padding(
+              //   padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.start,
+              //     children: [
+              //       Text(
+              //         LocalizationService().translate('mostReadBooks'),
+              //         style: const TextStyle(
+              //           fontSize: 14,
+              //           fontFamily: 'Montserrat-SemiBold',
+              //           color: Config.darkColor,
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              // const SizedBox(height: 5.0),
+              // SizedBox(
+              //   height: 135,
+              //   child: isLoading
+              //       ? ListView.builder(
+              //           scrollDirection: Axis.horizontal,
+              //           itemCount: 5, // Placeholder count
+              //           itemBuilder: (context, index) =>
+              //               shimmerMostReadBookCard(),
+              //         )
+              //       : ListView.builder(
+              //           scrollDirection: Axis.horizontal,
+              //           itemCount: mostReadBooks.length,
+              //           itemBuilder: (context, index) {
+              //             final book = mostReadBooks[index];
+              //             return MostReadBookCard(
+              //               book['id'],
+              //               book['title'],
+              //               book['description'],
+              //               book['author'],
+              //               book['image_link'],
+              //               book['pdf_link'],
+              //             );
+              //           },
+              //         ),
+              // ),
+              // const SizedBox(height: 15.0),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                padding: const EdgeInsets.symmetric(horizontal: 6.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      LocalizationService().translate('mostReadBooks'),
+                      LocalizationService().translate('pastors'),
                       style: const TextStyle(
-                        fontSize: 14,
+                        fontSize: 12,
                         fontFamily: 'Montserrat-SemiBold',
                         color: Config.darkColor,
                       ),
@@ -97,33 +148,41 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 5.0),
+              const SizedBox(height: 3.0),
               SizedBox(
-                height: 135,
+                height: 98.0,
                 child: isLoading
-                    ? ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: 5, // Placeholder count
-                        itemBuilder: (context, index) =>
-                            shimmerMostReadBookCard(),
-                      )
-                    : ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: mostReadBooks.length,
-                        itemBuilder: (context, index) {
-                          final book = mostReadBooks[index];
-                          return MostReadBookCard(
-                            book['id'],
-                            book['title'],
-                            book['description'],
-                            book['author'],
-                            book['image_link'],
-                            book['pdf_link'],
-                          );
-                        },
+                    ? shimmerPreachersCard()
+                    : Container(
+                        decoration: BoxDecoration(
+                          color: Config.whiteColor,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 12.0,
+                          horizontal: 8.0,
+                        ),
+                        child: preachers.isNotEmpty
+                            ? ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: preachers.length,
+                                itemBuilder: (context, index) {
+                                  final preacher = preachers[index];
+                                  return Preachers(
+                                    preacher['id'],
+                                    _trimFullname(preacher['fullname']),
+                                    preacher['bio'] ?? '',
+                                    preacher['image_link'],
+                                  );
+                                },
+                              )
+                            : Center(
+                                child: Text(
+                                    LocalizationService().translate('noData')),
+                              ),
                       ),
               ),
-              const SizedBox(height: 10.0),
+              const SizedBox(height: 20.0),
               Column(
                 children: [
                   Row(
@@ -132,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         LocalizationService().translate('newReleasedBooks'),
                         style: const TextStyle(
-                          fontSize: 14,
+                          fontSize: 12,
                           fontFamily: 'Montserrat-SemiBold',
                           color: Config.darkColor,
                         ),
@@ -142,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: const TextStyle(
                           color: Color.fromARGB(255, 0, 153, 254),
                           fontFamily: 'Montserrat-SemiBold',
-                          fontSize: 14,
+                          fontSize: 12,
                         ),
                       ),
                     ],
@@ -156,22 +215,27 @@ class _HomeScreenState extends State<HomeScreen> {
                           itemBuilder: (context, index) =>
                               shimmerNewReleasedBook(),
                         )
-                      : ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: newReleasedBooks.length,
-                          itemBuilder: (context, index) {
-                            final book = newReleasedBooks[index];
-                            return newReleasedBook(
-                              book['id'],
-                              book['title'],
-                              book['description'],
-                              book['author'],
-                              book['image_link'],
-                              book['pdf_link'],
-                            );
-                          },
-                        ),
+                      : newReleasedBooks.isNotEmpty
+                          ? ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: newReleasedBooks.length,
+                              itemBuilder: (context, index) {
+                                final book = newReleasedBooks[index];
+                                return newReleasedBook(
+                                  book['id'],
+                                  book['title'],
+                                  book['description'],
+                                  book['author'],
+                                  book['image_link'],
+                                  book['pdf_link'],
+                                );
+                              },
+                            )
+                          : Center(
+                              child: Text(
+                                  LocalizationService().translate('noData')),
+                            ),
                 ],
               ),
             ],
@@ -186,19 +250,98 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 5.0),
       child: GestureDetector(
         onTap: () {
-          // Route to a new page with the id
-          //Navigator.pushNamed(context, '/categoryDetail', arguments: id);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CategoryScreen(
+                categoryID: id,
+                title: label,
+              ),
+            ),
+          );
         },
         child: Chip(
           label: Text(LocalizationService().translate(label)),
-          backgroundColor: Config.primaryColor,
+          backgroundColor: Config.whiteColor,
           labelStyle: const TextStyle(
-            color: Colors.white,
+            color: Config.darkColor,
             fontFamily: 'Montserrat-SemiBold',
-            fontSize: 12.0,
+            fontSize: 10.0,
           ),
-          padding: const EdgeInsets.symmetric(vertical: 1.0, horizontal: 5.0),
-          elevation: 0,
+          elevation: 1.0,
+          shadowColor: const Color.fromARGB(0, 235, 235, 235),
+          labelPadding: const EdgeInsets.all(0),
+        ),
+      ),
+    );
+  }
+
+  // ignore: non_constant_identifier_names
+  Widget Preachers(int id, String fullname, String bio, String imageLink) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+      child: GestureDetector(
+        onTap: () {
+          // Navigate to the AudioScreen when tapped
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => VideoCollectionScreen(
+                  pastorId: id,
+                  pastorName: fullname,
+                  pastorBio: bio,
+                  imageUrl: imageLink),
+            ),
+          );
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 50.0,
+              height: 50.0,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(30),
+                child: Image.network(
+                  imageLink,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (BuildContext context, Widget child,
+                      ImageChunkEvent? loadingProgress) {
+                    if (loadingProgress == null) {
+                      return child;
+                    }
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                (loadingProgress.expectedTotalBytes ?? 1)
+                            : null,
+                      ),
+                    );
+                  },
+                  errorBuilder: (BuildContext context, Object error,
+                      StackTrace? stackTrace) {
+                    return const Icon(Icons.error, color: Colors.red);
+                  },
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 55.0,
+              child: Text(
+                fullname,
+                style: const TextStyle(
+                  color: Config.darkColor,
+                  fontFamily: 'Montserrat-SemiBold',
+                  fontSize: 8.0,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -231,7 +374,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Config.whiteColor,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Container(
@@ -275,7 +418,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Config.whiteColor,
             borderRadius: BorderRadius.circular(10),
           ),
           padding:
@@ -284,7 +427,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Container(
                 width: 60,
-                height: 70,
+                height: 60,
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(10.0),
@@ -300,20 +443,24 @@ class _HomeScreenState extends State<HomeScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: Color.fromARGB(255, 0, 0, 0),
-                      fontFamily: 'Montserrat-SemiBold',
-                      fontSize: 11,
+                  SizedBox(
+                    width: 170.0,
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        color: Color.fromARGB(255, 0, 0, 0),
+                        fontFamily: 'Montserrat-SemiBold',
+                        fontSize: 11,
+                      ),
                     ),
                   ),
                   Text(
                     author,
                     style: const TextStyle(
-                        color: Color.fromARGB(255, 99, 99, 99),
-                        fontFamily: 'Montserrat-SemiBold',
-                        fontSize: 11),
+                      color: Color.fromARGB(255, 99, 99, 99),
+                      fontFamily: 'Montserrat-SemiBold',
+                      fontSize: 11,
+                    ),
                   ),
                 ],
               ),
@@ -321,7 +468,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const Icon(
                 Icons.arrow_forward_ios,
                 color: Config.primaryColor,
-                size: 25.0,
+                size: 18.0,
               ),
             ],
           ),
@@ -348,7 +495,30 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget shimmerMostReadBookCard() {
+  // Widget shimmerMostReadBookCard() {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(horizontal: 5.0),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Shimmer.fromColors(
+  //           baseColor: Colors.grey[300]!,
+  //           highlightColor: Colors.grey[100]!,
+  //           child: Container(
+  //             width: 80,
+  //             height: 100,
+  //             decoration: BoxDecoration(
+  //               color: Colors.grey[300],
+  //               borderRadius: BorderRadius.circular(10),
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  Widget shimmerPreachersCard() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5.0),
       child: Column(
@@ -358,10 +528,9 @@ class _HomeScreenState extends State<HomeScreen> {
             baseColor: Colors.grey[300]!,
             highlightColor: Colors.grey[100]!,
             child: Container(
-              width: 80,
-              height: 100,
+              height: 80.0,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -418,4 +587,18 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
+
+// Helper method to process fullname
+String _trimFullname(String fullname) {
+  // Split the fullname into words
+  final words = fullname.split(' ');
+
+  // If more than two words, keep only the first two
+  if (words.length > 2) {
+    return '${words[0]} ${words[1]}';
+  }
+
+  // Otherwise, return the fullname as is
+  return fullname;
 }

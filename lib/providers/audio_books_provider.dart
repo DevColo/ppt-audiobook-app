@@ -10,6 +10,9 @@ class AudioBooksProvider with ChangeNotifier {
   List<dynamic> _books = [];
   List<dynamic> get books => _books;
 
+  List<dynamic> _categoryBooks = [];
+  List<dynamic> get categoryBooks => _categoryBooks;
+
   // Audio Books
   Future<void> _saveAudioBooksToPrefs(List<dynamic> audioBooks) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -80,6 +83,49 @@ class AudioBooksProvider with ChangeNotifier {
             style: const TextStyle(color: Colors.red),
           ),
           backgroundColor: const Color.fromARGB(255, 255, 216, 203),
+          elevation: 2.0,
+        ),
+      );
+    }
+  }
+
+  // CATEGORY BOOKS
+  Future<void> _saveCategoryBooksToPrefs(List<dynamic> categoryBooks) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('categoryBooks', jsonEncode(categoryBooks));
+  }
+
+  Future<void> _loadCategoryBooksFromPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? _categoryBooksString = prefs.getString('_categoryBooks');
+    if (_categoryBooksString != null) {
+      _categoryBooks = jsonDecode(_categoryBooksString);
+      notifyListeners();
+    }
+  }
+
+  void setCategoryBooks(List<dynamic> categoryBooks) {
+    _categoryBooks = categoryBooks;
+    notifyListeners();
+    _saveCategoryBooksToPrefs(categoryBooks);
+  }
+
+  Future<void> getCategoryBooks(BuildContext context, int categoryId) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? selectedLanguage =
+          prefs.getString('selectedLanguage') ?? 'Kinyarwanda';
+      final books = await AudioBooksApi().getCategoryBooksAPI(
+          language: selectedLanguage, categoryId: categoryId);
+      setCategoryBooks(books);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Please check internet connection and try again.",
+            style: TextStyle(color: Colors.red),
+          ),
+          backgroundColor: Color.fromARGB(255, 255, 216, 203),
           elevation: 2.0,
         ),
       );

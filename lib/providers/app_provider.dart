@@ -12,61 +12,8 @@ class AppProvider with ChangeNotifier {
   List<dynamic> _newReleasedBooks = [];
   List<dynamic> get newReleasedBooks => _newReleasedBooks;
 
-  List<dynamic> _audios = [];
-  List<dynamic> get audios => _audios;
-
-  String _userToken = '';
-  String get userToken => _userToken;
-
-  Map<String, dynamic> _userData = {};
-  Map<String, dynamic> get userData => _userData;
-
-  bool _isLogin = false;
-  Map<String, dynamic> user = {};
-
-  Future<void> _saveVideosToPrefs(List<dynamic> videos) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('videos', jsonEncode(videos));
-  }
-
-  Future<void> _loadVideosFromPrefs() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? videosString = prefs.getString('videos');
-    if (videosString != null) {
-      _mostReadBooks = jsonDecode(videosString);
-      notifyListeners();
-    }
-  }
-
-  // Audio
-  Future<void> _saveAudiosToPrefs(List<dynamic> audios) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('audios', jsonEncode(audios));
-  }
-
-  Future<void> _loadYearsFromPrefs() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? audiosString = prefs.getString('years');
-    if (audiosString != null) {
-      _audios = jsonDecode(audiosString);
-      notifyListeners();
-    }
-  }
-
-  void setAudios(List<dynamic> newAudios) {
-    _audios = newAudios;
-    notifyListeners();
-    _saveAudiosToPrefs(newAudios);
-  }
-
-  Future<void> getAllAudios() async {
-    try {
-      final audios = await ApiService().getAudioBook();
-      setAudios(audios);
-    } catch (e) {
-      print('Error fetching Audios: $e');
-    }
-  }
+  List<dynamic> _preachers = [];
+  List<dynamic> get preachers => _preachers;
 
   // MOST READ BOOKS
   Future<void> _saveMostReadBooksToPrefs(List<dynamic> mostReadBooks) async {
@@ -136,22 +83,53 @@ class AppProvider with ChangeNotifier {
 
       // Pass the selected language to the API call
       final newReleasedBooks =
-          await ApiService().getNewReleasedBooksAPI(language: selectedLanguage);
+          await _apiService.getNewReleasedBooksAPI(language: selectedLanguage);
       setNewReleasedBooks(newReleasedBooks);
     } catch (e) {
       print('Error fetching New Released Books: $e');
     }
   }
 
-  AppProvider() {
-    // Load data from shared preferences on initialization
-    // _loadSubjectsFromPrefs();
-    // _loadYearsFromPrefs();
-    //_loadQuestionsFromPrefs();
+  // Preachers
+  Future<void> _savePreachersToPrefs(List<dynamic> preachers) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('preachers', jsonEncode(preachers));
+  }
 
+  Future<void> _loadPreachersFromPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? _preachersString = prefs.getString('_preachers');
+    if (_preachersString != null) {
+      _preachers = jsonDecode(_preachersString);
+      notifyListeners();
+    }
+  }
+
+  void setPreachers(List<dynamic> newpreachers) {
+    _preachers = newpreachers;
+    notifyListeners();
+    _savePreachersToPrefs(newpreachers);
+  }
+
+  Future<void> getPreachers() async {
+    try {
+      // Fetch the selected language from SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? selectedLanguage =
+          prefs.getString('selectedLanguage') ?? 'Kinyarwanda';
+
+      // Pass the selected language to the API call
+      final preachers =
+          await _apiService.getPreachersAPI(language: selectedLanguage);
+      setPreachers(preachers);
+    } catch (e) {
+      print('Error fetching preachers: $e');
+    }
+  }
+
+  AppProvider() {
     // Fetch data from the API
-    getMostReadBooks();
+    getPreachers();
     getNewReleasedBooks();
-    getAllAudios();
   }
 }

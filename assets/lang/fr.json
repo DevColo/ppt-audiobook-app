@@ -15,10 +15,10 @@
   "Youth": "Jeunesse",
   "Loyalty": "Fidélité",
   "Love": "Amour",
-  "Download Book": "Télécharger le Livre",
-  "Download Audio": "Télécharger l'Audio",
-  "Share": "Partager",
-  "Search": "Rechercher",
+  "downloadBook": "Télécharger le Livre",
+  "downloadAudio": "Télécharger l'Audio",
+  "share": "Partager",
+  "search": "Rechercher",
   "searchPlaceholder": "Rechercher par titre, auteur ou catégorie",
   "searchResultText": "Les résultats de recherche s'afficheront ici",
   "support": "Soutien",
@@ -34,5 +34,7 @@
   "searchBookPreacher": "Trouver un livre ou un prédicateur",
   "myPlayList": "Ma liste de lecture",
   "downloads": "Télécharger",
-  "exit": "Sortie"
+  "exit": "Sortie",
+  "refresh": "Rafraîchir",
+  "noData": "Aucune donnée trouvée"
 }

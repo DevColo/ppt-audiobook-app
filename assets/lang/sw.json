@@ -15,10 +15,10 @@
     "Youth": "Vijana",
     "Loyalty": "Uaminifu",
     "Love": "Upendo",
-    "Download Book": "Pakua Kitabu",
-    "Download Audio": "Pakua Sauti",
-    "Share": "Shiriki",
-    "Search": "Tafuta",
+    "downloadBook": "Pakua Kitabu",
+    "downloadAudio": "Pakua Sauti",
+    "share": "Shiriki",
+    "search": "Tafuta",
     "searchPlaceholder": "Tafuta kwa kichwa, mwandishi au jamii",
     "searchResultText": "Matokeo ya utafutaji yataonekana hapa",
     "support": "Msaada",
@@ -34,5 +34,7 @@
     "searchBookPreacher": "Tafuta kitabu au Mhubiri",
     "myPlayList": "Orodha Yangu ya Kucheza",
     "downloads": "Pakua",
-    "exit": "Kubuela"
+    "exit": "Kubuela",
+    "refresh": "Furahisha",
+    "noData": "Hakuna Data Imepatikana"
 }

@@ -78,12 +78,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 const SizedBox(height: 50.0),
                 Image.asset(
                   'assets/images/logo.png',
-                  width: 210.0,
+                  width: 130.0,
                 ),
-                const SizedBox(height: 60.0),
+                const SizedBox(height: 20.0),
                 ...collectionsProvider.collections.map((collection) {
                   return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    padding: const EdgeInsets.symmetric(vertical: 5.0),
                     child: ElevatedButton(
                       onPressed: () async {
                         // Send the selected language to backend

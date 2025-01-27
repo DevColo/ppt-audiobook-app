@@ -6,7 +6,7 @@ class CategoriesApi {
   final Dio _dio = Dio(BaseOptions(baseUrl: 'https://ppt.codeetserver.com'));
   //final Dio _dio = Dio(BaseOptions(baseUrl: 'http://ppt.site'));
 
-  // Get video
+  // Get Categories
   Future<dynamic> getCategories() async {
     try {
       final response = await _dio.get('/api/get-categories');

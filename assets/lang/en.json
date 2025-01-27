@@ -8,17 +8,17 @@
     "mostReadBooks": "Most Read Books",
     "newReleasedBooks": "New Released Books",
     "seeAll": "See All",
-    "pastors": "Pastors",
+    "pastors": "Preachers",
     "Leadership": "Leadership",
     "Church": "Church",
     "Education": "Education",
     "Youth": "Youth",
     "Loyalty": "Loyalty",
     "Love": "Love",
-    "Download Book": "Download Book",
-    "Download Audio": "Download Audio",
-    "Share": "Share",
-    "Search": "Search",
+    "downloadBook": "Download Book",
+    "downloadAudio": "Download Audio",
+    "share": "Share",
+    "search": "Search",
     "searchPlaceholder": "Search by title, author or category",
     "searchResultText": "The search results will display here",
     "support": "Support",
@@ -34,6 +34,8 @@
     "searchBookPreacher": "Find book or Preacher",
     "myPlayList": "My Playlist",
     "downloads": "Downloads",
-    "exit": "Exit"
+    "exit": "Exit",
+    "refresh": "Refresh",
+    "noData": "No Data Found"
   }
   

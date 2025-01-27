@@ -15,10 +15,10 @@
     "Youth": "Urubyiruko",
     "Loyalty": "Kwizera",
     "Love": "Urukundo",
-    "Download Book": "Gutunga iki gitabo",
-    "Download Audio": "Gitunge mu majwi",
-    "Share": "Sakaza",
-    "Search": "Gushakisha",
+    "downloadBook": "Gutunga iki gitabo",
+    "downloadAudio": "Gitunge mu majwi",
+    "share": "Sakaza",
+    "search": "Gushakisha",
     "searchPlaceholder": "Shakisha umutwe wi gitabo , umwanditsi cyangwa icyiciro",
     "searchResultText": "Ibyo washakishe biriyereka aha",
     "support": "Inkunga",
@@ -34,6 +34,8 @@
     "searchBookPreacher": "Shakisha igitabo cyangwa Umubwiriza",
     "myPlayList": "Urutonde rwanjye",
     "downloads": "Gukuramo",
-    "exit": "Gusohoka"
+    "exit": "Gusohoka",
+    "refresh": "Humura",
+    "noData": "Nta makuru yabonetse"
   }
   

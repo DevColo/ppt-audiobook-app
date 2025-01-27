@@ -1,33 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:precious/providers/audio_books_provider.dart';
+import 'package:precious/providers/sermons_provider.dart';
 import 'package:precious/screens/audio_screen.dart';
+import 'package:precious/screens/video_screen.dart';
+import 'package:precious/utils/config.dart';
 import 'package:precious/utils/localization_service.dart';
 import 'package:provider/provider.dart';
-import 'package:precious/utils/config.dart';
 import 'package:shimmer/shimmer.dart';
 
-class AudioBooksScreen extends StatefulWidget {
-  const AudioBooksScreen({super.key});
+class CategoryScreen extends StatefulWidget {
+  final String title;
+  final int categoryID;
+
+  const CategoryScreen({
+    super.key,
+    required this.title,
+    required this.categoryID,
+  });
 
   @override
-  State<AudioBooksScreen> createState() => _AudioBooksScreenState();
+  State<CategoryScreen> createState() => _CategoryScreenState();
 }
 
-class _AudioBooksScreenState extends State<AudioBooksScreen> {
+class _CategoryScreenState extends State<CategoryScreen> {
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    fetchVideos();
     _loadData();
+  }
+
+  Future<void> fetchVideos() async {
+    await Provider.of<AudioBooksProvider>(context, listen: false)
+        .getCategoryBooks(context, widget.categoryID);
   }
 
   // Simulate data fetching and update the loading state
   Future<void> _loadData() async {
-    // Wait for data fetching (simulated)
+    // isLoading = true;
     await Future.delayed(const Duration(seconds: 1));
-
-    // Mark loading as complete
     setState(() {
       isLoading = false;
     });
@@ -35,10 +48,29 @@ class _AudioBooksScreenState extends State<AudioBooksScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Config().init(context);
-    final audioBooks = Provider.of<AudioBooksProvider>(context).audioBooks;
+    final audioBooks = Provider.of<AudioBooksProvider>(context).categoryBooks;
+
     return Scaffold(
       backgroundColor: Config.greyColor,
+      appBar: AppBar(
+        backgroundColor: Config.whiteColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Config.darkColor,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          LocalizationService().translate(widget.title),
+          style: const TextStyle(
+            fontSize: 14,
+            fontFamily: 'Montserrat-SemiBold',
+            color: Config.darkColor,
+          ),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(
           vertical: 1.0,
