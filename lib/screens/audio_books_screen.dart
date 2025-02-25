@@ -39,6 +39,25 @@ class _AudioBooksScreenState extends State<AudioBooksScreen> {
     final audioBooks = Provider.of<AudioBooksProvider>(context).audioBooks;
     return Scaffold(
       backgroundColor: Config.greyColor,
+      appBar: AppBar(
+        backgroundColor: Config.whiteColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Config.darkColor,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          LocalizationService().translate('audioBooks'),
+          style: const TextStyle(
+            fontSize: 16,
+            fontFamily: 'Montserrat-SemiBold',
+            color: Config.darkColor,
+          ),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(
           vertical: 1.0,

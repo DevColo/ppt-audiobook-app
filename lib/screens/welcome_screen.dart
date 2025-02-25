@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:precious/src/static_images.dart';
 import 'package:provider/provider.dart';
 import 'package:precious/providers/collections_provider.dart';
 import 'package:precious/utils/config.dart';
@@ -77,7 +78,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               children: [
                 const SizedBox(height: 50.0),
                 Image.asset(
-                  'assets/images/logo.png',
+                  preciousLogo,
                   width: 130.0,
                 ),
                 const SizedBox(height: 20.0),

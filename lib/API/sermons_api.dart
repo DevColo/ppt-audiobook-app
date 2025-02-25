@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 
 class SermonsApi {
-  final Dio _dio = Dio(BaseOptions(baseUrl: 'https://ppt.codeetserver.com'));
+  final Dio _dio = Dio(BaseOptions(baseUrl: 'https://ppt.druptech.com'));
   //final Dio _dio = Dio(BaseOptions(baseUrl: 'http://ppt.site'));
 
   // Get Pastors

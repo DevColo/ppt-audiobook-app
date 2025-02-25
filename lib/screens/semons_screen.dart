@@ -39,6 +39,25 @@ class _SermonsScreenState extends State<SermonsScreen> {
 
     return Scaffold(
       backgroundColor: Config.greyColor,
+      appBar: AppBar(
+        backgroundColor: Config.whiteColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Config.darkColor,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          LocalizationService().translate('pastors'),
+          style: const TextStyle(
+            fontSize: 16,
+            fontFamily: 'Montserrat-SemiBold',
+            color: Config.darkColor,
+          ),
+        ),
+      ),
       body: isLoading
           ? buildSkeletonScreen() // Show skeleton while loading
           : pastors.isNotEmpty

@@ -19,7 +19,7 @@
     "downloadAudio": "Download Audio",
     "share": "Share",
     "search": "Search",
-    "searchPlaceholder": "Search by title, author or category",
+    "searchPlaceholder": "Search by title or author",
     "searchResultText": "The search results will display here",
     "support": "Support",
     "changeLanguage": "Change language",
@@ -36,6 +36,9 @@
     "downloads": "Downloads",
     "exit": "Exit",
     "refresh": "Refresh",
-    "noData": "No Data Found"
+    "noData": "No Data Found",
+    "charity": "Charity",
+    "donations": "Donations",
+    "bible": "Bible"
   }
   

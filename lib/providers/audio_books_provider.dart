@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:precious/API/audio_books_api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,6 +14,14 @@ class AudioBooksProvider with ChangeNotifier {
 
   List<dynamic> _categoryBooks = [];
   List<dynamic> get categoryBooks => _categoryBooks;
+
+  // List<String> downloadedFiles = [];
+  Map<int, double> downloadProgress = {};
+  Map<int, bool> downloadComplete = {};
+
+  List<String> _downloadedFiles = [];
+
+  List<String> get downloadedFiles => _downloadedFiles;
 
   // Audio Books
   Future<void> _saveAudioBooksToPrefs(List<dynamic> audioBooks) async {
@@ -130,6 +140,60 @@ class AudioBooksProvider with ChangeNotifier {
         ),
       );
     }
+  }
+
+  void updateDownloadProgress(int index, double progress) {
+    downloadProgress[index] = progress;
+    notifyListeners();
+  }
+
+  void markDownloadComplete(int index, String filePath) {
+    downloadComplete[index] = true;
+    downloadedFiles.add(filePath);
+    notifyListeners();
+  }
+
+  bool isDownloadComplete(int index) {
+    return downloadComplete[index] ?? false;
+  }
+
+  double getDownloadProgress(int index) {
+    return downloadProgress[index] ?? 0.0;
+  }
+
+  Future<void> refreshDownloadedFiles() async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+
+      // List all files in the directory
+      final dir = Directory(directory.path);
+      if (dir.existsSync()) {
+        final files = dir
+            .listSync()
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.mp3')) // Filter for mp3 files
+            .map((file) => file.path)
+            .toList();
+
+        _downloadedFiles = files;
+        notifyListeners();
+      }
+    } catch (e) {
+      print('Error refreshing downloaded files: $e');
+      _downloadedFiles = [];
+      notifyListeners();
+    }
+  }
+
+  void removeDownloadedFile(String filePath) {
+    _downloadedFiles.remove(filePath);
+    notifyListeners();
+  }
+
+  // Add this method to check if a file is already downloaded
+  bool isFileDownloaded(String bookTitle, String chapterName) {
+    final expectedFileName = '${bookTitle}_${chapterName}.mp3';
+    return _downloadedFiles.any((path) => path.contains(expectedFileName));
   }
 
   AudioBooksProvider() {

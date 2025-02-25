@@ -10,7 +10,6 @@ import 'package:share_plus/share_plus.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:precious/providers/audio_books_provider.dart';
 import 'package:http/http.dart' as http;
-import 'package:precious/screens/chapter_audio_screen.dart';
 
 class AudioScreen extends StatefulWidget {
   final int bookID;
@@ -88,58 +87,10 @@ class _AudioScreenState extends State<AudioScreen> {
           Provider.of<AudioBooksProvider>(context, listen: false);
       await audioBooksProvider.getBooks(context, widget.bookID);
     } catch (e) {
+      // Handle fetch errors without breaking playback
       debugPrint("Error fetching chapters: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error loading chapters: $e')),
-      );
-    }
-  }
-
-  void openChapter(int index, List<dynamic> audioChapters) {
-    if (index >= 0 && index < audioChapters.length) {
-      final chapter = audioChapters[index];
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ChapterAudioScreen(
-            bookID: widget.bookID,
-            bookTitle: widget.title,
-            chapterName: 'Chapter ${chapter['chapter']}',
-            audioUrl: chapter['audio_link'],
-            imageUrl: widget.imageUrl,
-            chapterIndex: index,
-            onNavigateToChapter: (int nextIndex) {
-              // This function handles navigation between chapters
-              Navigator.pop(context);
-              if (nextIndex >= 0 && nextIndex < audioChapters.length) {
-                openChapter(nextIndex, audioChapters);
-              }
-            },
-          ),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Chapter not available')),
-      );
-    }
-  }
-
-  void openBook() {
-    try {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              PDFBookView(title: widget.title, pdfUrl: widget.pdfUrl),
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-              "Couldn't open the book, check your internet connections and try again."),
-        ),
       );
     }
   }
@@ -254,6 +205,25 @@ class _AudioScreenState extends State<AudioScreen> {
     }
   }
 
+  void openBook() {
+    try {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              PDFBookView(title: widget.title, pdfUrl: widget.pdfUrl),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              "Couldn't open the book, check your internet connections and try again."),
+        ),
+      );
+    }
+  }
+
   void shareAudio(String url) {
     Share.share(url);
   }
@@ -285,19 +255,19 @@ class _AudioScreenState extends State<AudioScreen> {
     final audioChapters = Provider.of<AudioBooksProvider>(context).books;
 
     return Scaffold(
-      backgroundColor: Config.greyColor,
+      backgroundColor: Config.darkColor,
       appBar: AppBar(
-        backgroundColor: Config.whiteColor,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Config.primaryColor),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
             icon: const Icon(
               Icons.book,
-              color: Config.primaryColor,
+              color: Config.whiteColor,
             ),
             onPressed: openBook,
           ),
@@ -339,7 +309,7 @@ class _AudioScreenState extends State<AudioScreen> {
                             Text(
                               widget.title,
                               style: const TextStyle(
-                                color: Config.darkColor,
+                                color: Colors.white,
                                 fontFamily: 'Montserrat-SemiBold',
                                 fontSize: 16,
                               ),
@@ -347,8 +317,8 @@ class _AudioScreenState extends State<AudioScreen> {
                             Text(
                               widget.author,
                               style: const TextStyle(
-                                color: Config.darkColor,
-                                fontFamily: 'Montserrat-SemiBold',
+                                color: Colors.white70,
+                                fontFamily: 'Montserrat-Regular',
                                 fontSize: 14,
                               ),
                             ),
@@ -356,8 +326,8 @@ class _AudioScreenState extends State<AudioScreen> {
                             Text(
                               _getDisplayText(widget.description),
                               style: const TextStyle(
-                                color: Config.darkColor,
-                                fontFamily: 'Montserrat-SemiBold',
+                                color: Colors.white,
+                                fontFamily: 'Montserrat-Regular',
                                 fontSize: 12,
                               ),
                             ),
@@ -396,6 +366,121 @@ class _AudioScreenState extends State<AudioScreen> {
                       : buildAudioChapterList(audioChapters),
                 ],
               )),
+            ),
+
+            // Player Controls (Non-scrollable)
+            Column(
+              children: [
+                // Slider for Audio Playback
+                Slider(
+                  value: sliderValue,
+                  min: 0,
+                  max: totalDuration.inMilliseconds.toDouble(),
+                  onChanged: (value) {
+                    setState(() {
+                      sliderValue = value;
+                    });
+                    _audioPlayer.seek(Duration(milliseconds: value.toInt()));
+                  },
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Text(
+                      formatDuration(currentPosition),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    Text(
+                      formatDuration(totalDuration),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+                // Control Buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    IconButton(
+                      icon:
+                          const Icon(Icons.skip_previous, color: Colors.white),
+                      onPressed: currentIndex != null && currentIndex! > 0
+                          ? () {
+                              final audioChapters =
+                                  Provider.of<AudioBooksProvider>(context,
+                                          listen: false)
+                                      .books;
+                              setState(() {
+                                currentIndex = currentIndex! - 1;
+                                isPlaying = true;
+                                currentPlayingChapter = currentIndex;
+                              });
+                              togglePlayChapter(
+                                  audioChapters[currentIndex!]['audio_link'],
+                                  currentIndex!);
+                            }
+                          : null,
+                    ),
+                    IconButton(
+                      icon: currentPlayingAudioUrl == null
+                          ? const Icon(Icons.play_arrow, color: Colors.white)
+                          : isAudioLoading
+                              ? const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Icon(
+                                  isPlaying ? Icons.pause : Icons.play_arrow,
+                                  color: Colors.white,
+                                ),
+                      onPressed:
+                          currentPlayingAudioUrl != null && !isAudioLoading
+                              ? () async {
+                                  if (isPlaying) {
+                                    await _audioPlayer.pause();
+                                    setState(() {
+                                      isPlaying = false;
+                                    });
+                                  } else {
+                                    await _audioPlayer.resume();
+                                    setState(() {
+                                      isPlaying = true;
+                                    });
+                                  }
+                                }
+                              : null,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.skip_next, color: Colors.white),
+                      onPressed: currentIndex != null &&
+                              currentIndex! < audioChapters.length - 1
+                          ? () {
+                              final audioChapters =
+                                  Provider.of<AudioBooksProvider>(context,
+                                          listen: false)
+                                      .books;
+                              setState(() {
+                                currentIndex = currentIndex! + 1;
+                                isPlaying = true;
+                                currentPlayingChapter = currentIndex;
+                              });
+                              togglePlayChapter(
+                                  audioChapters[currentIndex!]['audio_link'],
+                                  currentIndex!);
+                            }
+                          : null,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.queue_music, color: Colors.white),
+                      onPressed:
+                          audioChapters.isNotEmpty ? _playAllChapters : null,
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
@@ -452,79 +537,87 @@ class _AudioScreenState extends State<AudioScreen> {
   }
 
   Widget audioChapter(String chapter, String audioLink, int index) {
+    final isCurrentPlaying = currentPlayingChapter == index;
+    isDownloading =
+        Provider.of<AudioBooksProvider>(context).getDownloadProgress(index) > 0;
     final isDownloadComplete =
         Provider.of<AudioBooksProvider>(context).isDownloadComplete(index);
 
     return GestureDetector(
-      onTap: () {
-        final audioChapters =
-            Provider.of<AudioBooksProvider>(context, listen: false).books;
-        openChapter(index, audioChapters);
-      },
+      onTap: () => togglePlayChapter(audioLink, index),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 12.0),
+        padding: const EdgeInsets.symmetric(horizontal: 15.0),
         margin: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
-          color: Config.whiteColor,
+          color: isCurrentPlaying ? Config.primaryColor : Config.darkColor,
           borderRadius: BorderRadius.circular(10),
-          // border: Border.all(
-          //   width: 1.5,
-          //   color: Config.darkColor,
-          // ),
+          border: Border.all(
+            width: 1.5,
+            color: Config.whiteColor,
+          ),
         ),
         child: Row(
           children: [
-            // Small Chapter Icon
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                // ignore: deprecated_member_use
-                color: Config.primaryColor.withOpacity(0.2),
-              ),
-              child: const Center(
-                child: Icon(
-                  Icons.headphones,
-                  color: Config.primaryColor,
-                  size: 20,
+            Expanded(
+              child: Text(
+                'Chapter $chapter',
+                style: const TextStyle(
+                  color: Config.whiteColor,
+                  fontFamily: 'Montserrat-SemiBold',
+                  fontSize: 11,
                 ),
               ),
             ),
-
-            const SizedBox(width: 15),
-
-            // Chapter Text
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Chapter $chapter',
-                    style: const TextStyle(
-                      color: Config.darkColor,
-                      fontFamily: 'Montserrat-SemiBold',
-                      fontSize: 14,
-                    ),
-                  ),
-                  if (isDownloadComplete)
-                    const Text(
-                      "Downloaded",
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontSize: 12,
-                        fontFamily: 'Montserrat-Regular',
-                      ),
-                    ),
-                ],
+            if (isDownloading)
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  value: Provider.of<AudioBooksProvider>(context)
+                          .getDownloadProgress(index) /
+                      100,
+                  strokeWidth: 2,
+                  backgroundColor: Colors.grey,
+                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
               ),
-            ),
-
-            // Forward Icon
-            const Icon(
-              Icons.arrow_forward_ios,
-              color: Config.darkColor,
-              size: 16,
+            // if (isDownloadComplete)
+            //   const Icon(
+            //     Icons.check_circle,
+            //     color: Colors.green,
+            //     size: 20,
+            //   ),
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert, color: Config.whiteColor),
+              onSelected: (value) {
+                if (value == 'share') {
+                  shareAudio(audioLink);
+                } else if (value == 'download') {
+                  downloadAudio(audioLink, 'Chapter_$chapter.mp3', index);
+                }
+              },
+              itemBuilder: (BuildContext context) => [
+                PopupMenuItem(
+                  value: 'share',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.share, color: Colors.black),
+                      const SizedBox(width: 8),
+                      Text(LocalizationService().translate('share')),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'download',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.download, color: Colors.black),
+                      const SizedBox(width: 8),
+                      Text(LocalizationService().translate('download')),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -538,7 +631,7 @@ class _AudioScreenState extends State<AudioScreen> {
         child: Text(
           'No Audio Chapters',
           style: TextStyle(
-            color: Config.darkColor,
+            color: Config.whiteColor,
             fontFamily: 'Montserrat-Regular',
             fontSize: 12,
           ),
