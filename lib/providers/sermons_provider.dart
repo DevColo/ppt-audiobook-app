@@ -15,6 +15,9 @@ class SermonsProvider with ChangeNotifier {
   List<dynamic> _videos = [];
   List<dynamic> get videos => _videos;
 
+  List<dynamic> _youtube = [];
+  List<dynamic> get youtube => _youtube;
+
   // PASTORS
   Future<void> _savePastorsToPrefs(
       List<dynamic> newRelpastorseasedBooks) async {
@@ -133,8 +136,46 @@ class SermonsProvider with ChangeNotifier {
     }
   }
 
+  // Youtube Video
+  Future<void> _saveYoutubeToPrefs(List<dynamic> youtube) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('youtube', jsonEncode(youtube));
+  }
+
+  Future<void> _loadYoutubeFromPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? _youtubeString = prefs.getString('_youtube');
+    if (_youtubeString != null) {
+      _youtube = jsonDecode(_youtubeString);
+      notifyListeners();
+    }
+  }
+
+  void setYoutube(List<dynamic> youtube) {
+    _youtube = youtube;
+    notifyListeners();
+    _saveYoutubeToPrefs(youtube);
+  }
+
+  Future<void> getYoutube() async {
+    try {
+      // Fetch the selected language from SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? selectedLanguage =
+          prefs.getString('selectedLanguage') ?? 'Kinyarwanda';
+
+      // Pass the selected language to the API call
+      final youtube =
+          await _sermonsApi.getYoutubeAPI(language: selectedLanguage);
+      setYoutube(youtube);
+    } catch (e) {
+      print('Error fetching youtube videos: $e');
+    }
+  }
+
   SermonsProvider() {
     // Fetch data from the API
     getPastors();
+    getYoutube();
   }
 }

@@ -52,7 +52,12 @@ dependencies:
   youtube_explode_dart: ^2.3.9
   flutter_downloader: ^1.11.6
   permission_handler: ^11.0.1
-
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.10.0
+  just_audio: ^0.9.46
+  audio_service: ^0.18.17
+  audio_session: ^0.1.25
+  video_player: ^2.9.3
 dev_dependencies:
   flutter_test:
     sdk: flutter

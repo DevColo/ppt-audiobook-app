@@ -3,7 +3,7 @@
     "home": "Esika ya Liboso",
     "categories": "Makambo",
     "sermons": "Mateya",
-    "audioBooks": "Mikanda ya Sango ya Maloba",
+    "audioBooks": "Mikanda ya Sango ya..",
     "settings": "Biloko",
     "mostReadBooks": "Mikanda Oyo Ebalolamaka Mingi",
     "newReleasedBooks": "Mikanda ya Sika Ebimaki",
@@ -39,5 +39,15 @@
     "noData": "Ba Données Ezwami Te",
     "charity": "Charikokabela babolaty",
     "donations": "Makabo ya kopesa",
-    "bible": "Biblia"
+    "bible": "Biblia",
+    "bankAccountDetails": "Bisolo ya compte ya banki",
+    "bankName": "Kombo ya banki",
+    "accountNumber": "Numero ya compte",
+    "mobileMoneyDetails": "Bisolo ya Mobile Money",
+    "mtnMobileMoney": "MTN Mobile Money",
+    "airtelTigoMoney": "Airtel Tigo Money",
+    "vodafoneCash": "Vodafone Cash",
+    "about": "Precious Present Truth, Inc. (PPT) ezali lisangá ya bato ya kosakola sango malamu, ya bato ya Laïcs Adventistes ya Mokolo ya Nsambo, oyo ezali na tina ya kokabola Sango ya Bangeloi Misato na bato ya Afrika. Tosakolaka Sango ya Bangeloi Misato ya Emoniseli 14 epai ya bana Afrika na minoko na bango moko, na nzela ya bapanzi sango, mikanda mpe mikutani ya kosakola sango na esika. Tozali kondima mpe koteya elongo na Misio ya Mokambi-Mokonzi ya Lingomba ya Adventiste ya Mokolo ya Nsambo mpe makambo na bango ya Total Member Involvement (TMI) mpe Nakokende. Na Kinshasa, Minisite ya PPT, elongo na Konferanse ya mboka, esalaki mikutani mibale ya kosakola sango elongo na basakoli ya mboka nyonso oyo bayebi malamu mosala. Nzambe apambolaki mosala na biso na babatisami koleka 360.",
+    "aboutUs": "Ala Makambo na Biso",
+    "bibleVerses": "Bavɛrsɛ ya Biblia"
 }

@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 
 class SermonsApi {
-  final Dio _dio = Dio(BaseOptions(baseUrl: 'https://ppt.druptech.com'));
-  //final Dio _dio = Dio(BaseOptions(baseUrl: 'http://ppt.site'));
+  //final Dio _dio = Dio(BaseOptions(baseUrl: 'https://ppt.druptech.com'));
+  final Dio _dio = Dio(BaseOptions(baseUrl: 'http://ppt.site'));
 
   // Get Pastors
   Future<dynamic> getPastorsAPI({required String language}) async {
@@ -33,6 +33,16 @@ class SermonsApi {
       return response.data;
     } catch (e) {
       throw Exception('Failed to load videos: $e');
+    }
+  }
+
+  // Get Home Youtube videos
+  Future<dynamic> getYoutubeAPI({required String language}) async {
+    try {
+      final response = await _dio.get('/api/$language/home-videos');
+      return response.data;
+    } catch (e) {
+      throw Exception('Failed to load home videos: $e');
     }
   }
 }

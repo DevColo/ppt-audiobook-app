@@ -1,26 +1,44 @@
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+// Handlers & Providers
 import 'package:precious/components/audio_player_handler.dart';
 import 'package:precious/providers/audio_player_provider.dart';
-import 'package:precious/providers/bible_provider.dart';
-import 'package:precious/providers/bible_verses_provider.dart';
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
 import 'package:precious/providers/audio_books_provider.dart';
-import 'package:precious/providers/categories_provider.dart';
 import 'package:precious/providers/sermons_provider.dart';
-import 'package:precious/screens/get_in_touch_screen.dart';
-import 'package:precious/screens/settings_screen.dart';
-import 'package:provider/provider.dart';
-import 'package:precious/main_layout.dart';
-import 'package:precious/screens/welcome_screen.dart';
 import 'package:precious/providers/app_provider.dart';
 import 'package:precious/providers/collections_provider.dart';
 
+// Screens
+import 'package:precious/screens/get_in_touch_screen.dart';
+import 'package:precious/screens/settings_screen.dart';
+import 'package:precious/screens/welcome_screen.dart';
+import 'package:precious/main_layout.dart';
+
+// Timezone for scheduled notifications
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+
+// Declare the audio handler as a global late final
+late final AudioPlayerHandler _audioHandler;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize timezones (for notifications)
   tz.initializeTimeZones();
+
+  // Initialize the audio service with the custom handler
+  _audioHandler = await AudioService.init(
+    builder: () => AudioPlayerHandler(),
+    config: const AudioServiceConfig(
+      androidNotificationChannelId: 'com.precious.channel.audio',
+      androidNotificationChannelName: 'PPT Audio Playback',
+      androidNotificationOngoing: true,
+    ),
+  );
 
   runApp(
     MultiProvider(
@@ -29,10 +47,11 @@ void main() async {
         ChangeNotifierProvider(create: (_) => CollectionsProvider()),
         ChangeNotifierProvider(create: (_) => SermonsProvider()),
         ChangeNotifierProvider(create: (_) => AudioBooksProvider()),
-        ChangeNotifierProvider(create: (_) => AudioPlayerProvider()),
-        ChangeNotifierProvider(create: (_) => CategoriesProvider()),
-        ChangeNotifierProvider(create: (_) => BibleVersesProvider()),
-        ChangeNotifierProvider(create: (_) => BibleProvider()),
+
+        // Inject the audio handler into the AudioPlayerProvider
+        ChangeNotifierProvider(
+          create: (_) => AudioPlayerProvider(),
+        ),
       ],
       child: const MyApp(),
     ),
@@ -60,7 +79,7 @@ class _MyAppState extends State<MyApp> {
     _scheduleNotification();
   }
 
-  // Initialize local notifications
+  /// Initialize local notifications
   Future<void> _initializeNotifications() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -73,11 +92,11 @@ class _MyAppState extends State<MyApp> {
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
-  // Schedule a notification after 2 minutes
+  /// Schedule a notification after 2 minutes
   Future<void> _scheduleNotification() async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-      'your_channel_id', // Unique channel ID
+      'scheduled_channel_id', // Unique channel ID
       'Scheduled Notifications',
       channelDescription: 'Channel for scheduled notifications',
       importance: Importance.max,
@@ -92,8 +111,7 @@ class _MyAppState extends State<MyApp> {
       0, // Notification ID
       'Reminder',
       'Check out a new released audio book!',
-      tz.TZDateTime.now(tz.local)
-          .add(const Duration(minutes: 2)), // Fire after 2 minutes
+      tz.TZDateTime.now(tz.local).add(const Duration(minutes: 2)),
       platformChannelSpecifics,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:

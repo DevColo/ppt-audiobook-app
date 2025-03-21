@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:precious/main_layout.dart';
 import 'package:precious/src/static_images.dart';
 import 'package:provider/provider.dart';
 import 'package:precious/providers/collections_provider.dart';
 import 'package:precious/utils/config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:precious/utils/localization_service.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -50,7 +52,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget build(BuildContext context) {
     final collectionsProvider = Provider.of<CollectionsProvider>(context);
 
-    // page loader
+    // Page loader using SpinKit
     const spinkit = SpinKitSpinningLines(
       color: Config.primaryColor,
     );
@@ -66,39 +68,40 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
     return Scaffold(
       backgroundColor: Config.whiteColor,
-      body: SingleChildScrollView(
-        child: Container(
-          color: Config.whiteColor,
-          height: Config.screenHeight,
-          child: Center(
+      body: Center(
+        child: SingleChildScrollView(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            color: Config.whiteColor,
             child: Column(
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 50.0),
                 Image.asset(
                   preciousLogo,
-                  width: 130.0,
+                  width: 150.0,
                 ),
-                const SizedBox(height: 20.0),
+                const SizedBox(height: 30.0),
                 ...collectionsProvider.collections.map((collection) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 5.0),
                     child: ElevatedButton(
                       onPressed: () async {
-                        // Send the selected language to backend
                         await collectionsProvider
                             .selectLanguage(collection['title']);
 
-                        // Save the selected language to SharedPreferences
                         SharedPreferences prefs =
                             await SharedPreferences.getInstance();
                         await prefs.setString(
                             'selectedLanguage', collection['title']);
 
-                        // Navigate to the main screen
-                        Navigator.pushNamed(context, 'main');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MainLayout(),
+                          ),
+                        );
                       },
                       style: ButtonStyle(
                         backgroundColor:
@@ -132,7 +135,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       ),
                     ),
                   );
-                }),
+                }).toList(),
               ],
             ),
           ),

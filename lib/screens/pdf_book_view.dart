@@ -48,13 +48,14 @@ class _PDFBookViewState extends State<PDFBookView> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
-        backgroundColor: Config.darkColor,
-        foregroundColor: Config.whiteColor,
+        backgroundColor: Config.whiteColor,
+        foregroundColor: Config.primaryColor,
         title: Text(
           widget.title,
           style: const TextStyle(
             fontFamily: "Raleway-Regular",
             fontSize: 15.0,
+            color: Config.darkColor,
           ),
         ),
         toolbarHeight: 45,
@@ -70,7 +71,7 @@ class _PDFBookViewState extends State<PDFBookView> {
                 Text('Page $page of $total');
               },
             )
-          : Center(child: CircularProgressIndicator()),
+          : const Center(child: CircularProgressIndicator()),
     );
   }
 }

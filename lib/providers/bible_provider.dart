@@ -1,19 +1,22 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:precious/API/audio_books_api.dart';
+import 'package:precious/API/bible_api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class AudioBooksProvider with ChangeNotifier {
-  List<dynamic> _audioBooks = [];
-  List<dynamic> get audioBooks => _audioBooks;
+class BibleProvider with ChangeNotifier {
+  final BibleApi _bibleApi = BibleApi();
+
+  List<dynamic> _testaments = [];
+  List<dynamic> get testaments => _testaments;
 
   List<dynamic> _books = [];
   List<dynamic> get books => _books;
 
-  List<dynamic> _categoryBooks = [];
-  List<dynamic> get categoryBooks => _categoryBooks;
+  List<dynamic> _audios = [];
+  List<dynamic> get audios => _audios;
 
   Map<int, double> downloadProgress = {};
   Map<int, bool> downloadComplete = {};
@@ -22,28 +25,28 @@ class AudioBooksProvider with ChangeNotifier {
 
   List<String> get downloadedFiles => _downloadedFiles;
 
-  // Audio Books
-  Future<void> _saveAudioBooksToPrefs(List<dynamic> audioBooks) async {
+  // TESTAMENTS
+  Future<void> _saveTestamentsToPrefs(List<dynamic> testaments) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('audioBooks', jsonEncode(audioBooks));
+    await prefs.setString('testaments', jsonEncode(testaments));
   }
 
-  Future<void> _loadAudioBooksFromPrefs() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? _audioBooksString = prefs.getString('_audioBooks');
-    if (_audioBooksString != null) {
-      _audioBooks = jsonDecode(_audioBooksString);
-      notifyListeners();
-    }
-  }
+  // Future<void> _loadTestamentsFromPrefs() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String? _testamentsString = prefs.getString('_testaments');
+  //   if (_testamentsString != null) {
+  //     _testaments = jsonDecode(_testamentsString);
+  //     notifyListeners();
+  //   }
+  // }
 
-  void setAudioBooks(List<dynamic> audioBooks) {
-    _audioBooks = audioBooks;
+  void setTestaments(List<dynamic> testaments) {
+    _testaments = testaments;
     notifyListeners();
-    _saveAudioBooksToPrefs(audioBooks);
+    _saveTestamentsToPrefs(testaments);
   }
 
-  Future<void> getAudioBooks() async {
+  Future<void> getTestaments() async {
     try {
       // Fetch the selected language from SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -51,11 +54,13 @@ class AudioBooksProvider with ChangeNotifier {
           prefs.getString('selectedLanguage') ?? 'Kinyarwanda';
 
       // Pass the selected language to the API call
-      final audioBooks =
-          await AudioBooksApi().getAudioBooksAPI(language: selectedLanguage);
-      setAudioBooks(audioBooks);
+      final testaments =
+          await _bibleApi.getTestamentsAPI(language: selectedLanguage);
+      setTestaments(testaments);
     } catch (e) {
-      print('Error fetching audio books: $e');
+      if (kDebugMode) {
+        print('Error fetching Testaments: $e');
+      }
     }
   }
 
@@ -65,14 +70,14 @@ class AudioBooksProvider with ChangeNotifier {
     await prefs.setString('books', jsonEncode(books));
   }
 
-  Future<void> _loadBooksFromPrefs() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? _booksString = prefs.getString('_books');
-    if (_booksString != null) {
-      _books = jsonDecode(_booksString);
-      notifyListeners();
-    }
-  }
+  // Future<void> _loadBooksFromPrefs() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String? _booksString = prefs.getString('_books');
+  //   if (_booksString != null) {
+  //     _books = jsonDecode(_booksString);
+  //     notifyListeners();
+  //   }
+  // }
 
   void setBooks(List<dynamic> books) {
     _books = books;
@@ -80,15 +85,15 @@ class AudioBooksProvider with ChangeNotifier {
     _saveBooksToPrefs(books);
   }
 
-  Future<void> getBooks(BuildContext context, int bookId) async {
+  Future<void> getBibleBooks(BuildContext context, int testamentID) async {
     try {
-      final books = await AudioBooksApi().getBookAPI(bookId: bookId);
+      final books = await _bibleApi.getBibleBooksAPI(testamentID: testamentID);
       setBooks(books);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            "Please check internet connection and try again.",
+            'Error fetching books: $e',
             style: const TextStyle(color: Colors.red),
           ),
           backgroundColor: const Color.fromARGB(255, 255, 216, 203),
@@ -98,43 +103,39 @@ class AudioBooksProvider with ChangeNotifier {
     }
   }
 
-  // CATEGORY BOOKS
-  Future<void> _saveCategoryBooksToPrefs(List<dynamic> categoryBooks) async {
+  // AUDIOS
+  Future<void> _saveAudiosToPrefs(List<dynamic> audios) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('categoryBooks', jsonEncode(categoryBooks));
+    await prefs.setString('audios', jsonEncode(audios));
   }
 
-  Future<void> _loadCategoryBooksFromPrefs() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? _categoryBooksString = prefs.getString('_categoryBooks');
-    if (_categoryBooksString != null) {
-      _categoryBooks = jsonDecode(_categoryBooksString);
-      notifyListeners();
-    }
-  }
+  // Future<void> _loadAudiosFromPrefs() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String? _audiosString = prefs.getString('_audios');
+  //   if (_audiosString != null) {
+  //     _audios = jsonDecode(_audiosString);
+  //     notifyListeners();
+  //   }
+  // }
 
-  void setCategoryBooks(List<dynamic> categoryBooks) {
-    _categoryBooks = categoryBooks;
+  void setAudios(List<dynamic> audios) {
+    _audios = audios;
     notifyListeners();
-    _saveCategoryBooksToPrefs(categoryBooks);
+    _saveAudiosToPrefs(audios);
   }
 
-  Future<void> getCategoryBooks(BuildContext context, int categoryId) async {
+  Future<void> getBibleBookAudios(BuildContext context, int bookId) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? selectedLanguage =
-          prefs.getString('selectedLanguage') ?? 'Kinyarwanda';
-      final books = await AudioBooksApi().getCategoryBooksAPI(
-          language: selectedLanguage, categoryId: categoryId);
-      setCategoryBooks(books);
+      final audios = await _bibleApi.getBibleBookAudiosAPI(bookId: bookId);
+      setAudios(audios);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
             "Please check internet connection and try again.",
-            style: TextStyle(color: Colors.red),
+            style: const TextStyle(color: Colors.red),
           ),
-          backgroundColor: Color.fromARGB(255, 255, 216, 203),
+          backgroundColor: const Color.fromARGB(255, 255, 216, 203),
           elevation: 2.0,
         ),
       );
@@ -195,8 +196,8 @@ class AudioBooksProvider with ChangeNotifier {
     return _downloadedFiles.any((path) => path.contains(expectedFileName));
   }
 
-  AudioBooksProvider() {
+  BibleProvider() {
     // Fetch data from the API
-    getAudioBooks();
+    getTestaments();
   }
 }

@@ -17,9 +17,6 @@ class _GetInTouchScreenState extends State<GetInTouchScreen> {
     super.initState();
   }
 
-  final String websiteUrl = 'https://www.example.com';
-  final String phoneNumber = '+1234567890';
-
   // Function to open a URL in the browser
   Future<void> openUrlInBrowser(String url) async {
     final Uri uri = Uri.parse(url);
@@ -27,7 +24,7 @@ class _GetInTouchScreenState extends State<GetInTouchScreen> {
     if (await canLaunchUrl(uri)) {
       await launchUrl(
         uri,
-        mode: LaunchMode.externalApplication, // Opens in the default browser
+        mode: LaunchMode.externalApplication,
       );
     } else {
       throw 'Could not launch $url';
@@ -83,36 +80,41 @@ class _GetInTouchScreenState extends State<GetInTouchScreen> {
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            SizedBox(
-              width: Config.screenWidth,
-              child: Text(
-                LocalizationService().translate('supportTitle'),
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Montserrat-SemiBold',
-                  color: Config.darkColor,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              SizedBox(
+                width: Config.screenWidth,
+                child: Text(
+                  LocalizationService().translate('supportTitle'),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'Montserrat-SemiBold',
+                    color: Config.darkColor,
+                  ),
                 ),
               ),
-            ),
-            SizedBox(
-              width: Config.screenWidth,
-              child: Text(
-                LocalizationService().translate('supportText'),
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontFamily: 'Montserrat-Regular',
-                  color: Config.darkColor,
+              SizedBox(
+                width: Config.screenWidth,
+                child: Text(
+                  LocalizationService().translate('supportText'),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontFamily: 'Montserrat-Regular',
+                    color: Config.darkColor,
+                  ),
                 ),
               ),
-            ),
-            callUs(),
-            emailUs(),
-            ourWebsite()
-          ],
+              callUs(),
+              emailUs(),
+              ourWebsite(),
+              tiktok(),
+              facebook(),
+              instagram()
+            ],
+          ),
         ),
       ),
     );
@@ -312,6 +314,200 @@ class _GetInTouchScreenState extends State<GetInTouchScreen> {
                     width: 160.0,
                     child: Text(
                       'https://preciouspresenttruth.org',
+                      style: TextStyle(
+                        color: Config.darkColor,
+                        fontFamily: 'Montserrat-Regular',
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              const Icon(Icons.arrow_forward_ios,
+                  color: Config.primaryColor, size: 20.0),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget tiktok() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: GestureDetector(
+        onTap: () {
+          openUrlInBrowser('https://www.tiktok.com/@ppt.kinyarwanda');
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          padding: const EdgeInsets.all(10.0),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Config.greyColorTransperant,
+                ),
+                child: const Icon(Icons.tiktok,
+                    color: Config.primaryColor, size: 20.0),
+              ),
+              const SizedBox(width: 15),
+              const Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 150.0,
+                    child: Text(
+                      'Tiktok',
+                      style: const TextStyle(
+                        color: Config.darkColor,
+                        fontFamily: 'Montserrat-SemiBold',
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 160.0,
+                    child: Text(
+                      '@ppt.kinyarwanda',
+                      style: TextStyle(
+                        color: Config.darkColor,
+                        fontFamily: 'Montserrat-Regular',
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              const Icon(Icons.arrow_forward_ios,
+                  color: Config.primaryColor, size: 20.0),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget facebook() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: GestureDetector(
+        onTap: () {
+          openUrlInBrowser(
+              'https://www.facebook.com/profile.php?id=100088460659490');
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          padding: const EdgeInsets.all(10.0),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Config.greyColorTransperant,
+                ),
+                child: const Icon(Icons.facebook,
+                    color: Config.primaryColor, size: 20.0),
+              ),
+              const SizedBox(width: 15),
+              const Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 150.0,
+                    child: Text(
+                      'Facebook',
+                      style: const TextStyle(
+                        color: Config.darkColor,
+                        fontFamily: 'Montserrat-SemiBold',
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 160.0,
+                    child: Text(
+                      '@preciouspresenttruth',
+                      style: TextStyle(
+                        color: Config.darkColor,
+                        fontFamily: 'Montserrat-Regular',
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              const Icon(Icons.arrow_forward_ios,
+                  color: Config.primaryColor, size: 20.0),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget instagram() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: GestureDetector(
+        onTap: () {
+          openUrlInBrowser(
+              'https://www.instagram.com/preciouspresentfrancais/');
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          padding: const EdgeInsets.all(10.0),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Config.greyColorTransperant,
+                ),
+                child: const Icon(Icons.web,
+                    color: Config.primaryColor, size: 20.0),
+              ),
+              const SizedBox(width: 15),
+              const Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 150.0,
+                    child: Text(
+                      'Instagram',
+                      style: const TextStyle(
+                        color: Config.darkColor,
+                        fontFamily: 'Montserrat-SemiBold',
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 160.0,
+                    child: Text(
+                      '@preciouspresent',
                       style: TextStyle(
                         color: Config.darkColor,
                         fontFamily: 'Montserrat-Regular',

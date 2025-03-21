@@ -1,38 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:precious/components/floating_audio_player.dart';
-import 'package:precious/providers/sermons_provider.dart';
-import 'package:precious/screens/video_screen.dart';
+import 'package:precious/providers/bible_verses_provider.dart';
+import 'package:precious/screens/bible_verse_screen.dart';
 import 'package:precious/utils/config.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
-class PlayListVideosScreen extends StatefulWidget {
-  final String title;
-  final int playListId;
-
-  const PlayListVideosScreen({
-    super.key,
-    required this.title,
-    required this.playListId,
-  });
+class BibleVersesScreen extends StatefulWidget {
+  const BibleVersesScreen({super.key});
 
   @override
-  State<PlayListVideosScreen> createState() => _PlayListVideosScreenState();
+  State<BibleVersesScreen> createState() => _BibleVersesScreenState();
 }
 
-class _PlayListVideosScreenState extends State<PlayListVideosScreen> {
+class _BibleVersesScreenState extends State<BibleVersesScreen> {
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    fetchVideos();
     _loadData();
-  }
-
-  Future<void> fetchVideos() async {
-    await Provider.of<SermonsProvider>(context, listen: false)
-        .getVideos(context, widget.playListId);
   }
 
   // Simulate data fetching and update the loading state
@@ -46,7 +33,7 @@ class _PlayListVideosScreenState extends State<PlayListVideosScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final videoPlayList = Provider.of<SermonsProvider>(context).videos;
+    final verses = Provider.of<BibleVersesProvider>(context).verses;
 
     return Scaffold(
       backgroundColor: Config.greyColor,
@@ -60,9 +47,9 @@ class _PlayListVideosScreenState extends State<PlayListVideosScreen> {
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
-          widget.title,
-          style: const TextStyle(
+        title: const Text(
+          "Bibiliya",
+          style: TextStyle(
             fontSize: 12,
             fontFamily: 'Montserrat-SemiBold',
             color: Config.darkColor,
@@ -78,22 +65,26 @@ class _PlayListVideosScreenState extends State<PlayListVideosScreen> {
                 ? ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: 5, // Placeholder count
-                    itemBuilder: (context, index) => shimmerVideoPlayList(),
+                    itemCount: 5,
+                    itemBuilder: (context, index) => shimmerBibleVerses(),
                   )
-                : ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: videoPlayList.length,
-                    itemBuilder: (context, index) {
-                      final video = videoPlayList[index];
-                      return videoCard(
-                        video['title'],
-                        video['video_link'],
-                        widget.playListId,
-                      );
-                    },
-                  ),
+                : verses.isNotEmpty
+                    ? ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: verses.length,
+                        itemBuilder: (context, index) {
+                          final book = verses[index];
+                          return bibleVerse(
+                            book['id'],
+                            book['title'],
+                            book['video_link'],
+                          );
+                        },
+                      )
+                    : const Center(
+                        child: Text(''),
+                      ),
             FloatingAudioControl(),
           ],
         ),
@@ -101,7 +92,8 @@ class _PlayListVideosScreenState extends State<PlayListVideosScreen> {
     );
   }
 
-  Widget shimmerVideoPlayList() {
+  // shimmer Bible Verses
+  Widget shimmerBibleVerses() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Shimmer.fromColors(
@@ -109,9 +101,6 @@ class _PlayListVideosScreenState extends State<PlayListVideosScreen> {
         highlightColor: Colors.grey[100]!,
         child: Row(
           children: [
-            Container(
-              height: 70,
-            ),
             const SizedBox(width: 10.0),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,16 +111,11 @@ class _PlayListVideosScreenState extends State<PlayListVideosScreen> {
                   color: Colors.grey[300],
                 ),
                 const SizedBox(height: 5.0),
-                Container(
-                  width: 80,
-                  height: 12,
-                  color: Colors.grey[300],
-                ),
               ],
             ),
             const Spacer(),
             const Icon(
-              Icons.play_circle_fill,
+              Icons.arrow_forward_ios,
               color: Colors.grey, // Adjusted for shimmer
               size: 25.0,
             ),
@@ -141,47 +125,44 @@ class _PlayListVideosScreenState extends State<PlayListVideosScreen> {
     );
   }
 
-  Widget videoCard(String title, String videoLink, int playListID) {
+  Widget bibleVerse(int id, String title, String videoLink) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: GestureDetector(
         onTap: () {
+          //Navigate to the BibleVerseScreen when tapped
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => VideoScreen(
+              builder: (context) => BibleVerseScreen(
                 title: title,
                 videoLink: videoLink,
-                playListID: playListID,
               ),
             ),
           );
         },
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Config.whiteColor,
             borderRadius: BorderRadius.circular(10),
           ),
-          padding:
-              const EdgeInsets.only(left: 0, top: 0, bottom: 0, right: 8.0),
+          padding: const EdgeInsets.only(
+              left: 10.0, top: 10.0, bottom: 10.0, right: 8.0),
           child: Row(
             children: [
-              Container(
-                height: 50,
-              ),
-              const SizedBox(width: 20.0),
+              const SizedBox(width: 10.0),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const SizedBox(width: 20.0),
                   SizedBox(
-                    width: 230,
-                    //height: 40.0,
+                    width: 170.0,
                     child: Text(
                       title,
                       style: const TextStyle(
                         color: Color.fromARGB(255, 0, 0, 0),
                         fontFamily: 'Montserrat-SemiBold',
-                        fontSize: 13,
+                        fontSize: 11,
                       ),
                     ),
                   ),
@@ -189,9 +170,9 @@ class _PlayListVideosScreenState extends State<PlayListVideosScreen> {
               ),
               const Spacer(),
               const Icon(
-                Icons.play_circle_fill,
+                Icons.arrow_forward_ios,
                 color: Config.primaryColor,
-                size: 25.0,
+                size: 16.0,
               ),
             ],
           ),

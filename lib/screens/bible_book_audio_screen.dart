@@ -1,43 +1,34 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:precious/providers/bible_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
-import 'package:precious/providers/audio_books_provider.dart';
+//import 'package:precious/providers/audio_books_provider.dart';
 import 'package:precious/providers/audio_player_provider.dart';
-import 'package:precious/screens/pdf_book_view.dart';
 import 'package:precious/utils/config.dart';
 import 'package:precious/utils/localization_service.dart';
 
-class AudioScreen extends StatefulWidget {
+class BibleBookAudioScreen extends StatefulWidget {
   final int bookID;
   final String title;
-  final String description;
-  final String author;
-  final String imageUrl;
-  final String pdfUrl;
 
-  const AudioScreen({
+  const BibleBookAudioScreen({
     super.key,
     required this.bookID,
     required this.title,
-    required this.description,
-    required this.author,
-    required this.imageUrl,
-    required this.pdfUrl,
   });
 
   @override
-  State<AudioScreen> createState() => _AudioScreenState();
+  State<BibleBookAudioScreen> createState() => _BibleBookAudioScreenState();
 }
 
-class _AudioScreenState extends State<AudioScreen> {
+class _BibleBookAudioScreenState extends State<BibleBookAudioScreen> {
   bool isLoading = true;
   bool isDownloading = false;
   int? currentIndex;
-  bool _isExpanded = false;
 
   @override
   void initState() {
@@ -47,11 +38,10 @@ class _AudioScreenState extends State<AudioScreen> {
 
   Future<void> fetchChapters() async {
     try {
-      final provider = Provider.of<AudioBooksProvider>(context, listen: false);
-      await provider.getBooks(context, widget.bookID);
+      final provider = Provider.of<BibleProvider>(context, listen: false);
+      await provider.getBibleBookAudios(context, widget.bookID);
       setState(() => isLoading = false);
     } catch (e) {
-      debugPrint("Error fetching chapters: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Failed to load chapters")),
       );
@@ -70,7 +60,7 @@ class _AudioScreenState extends State<AudioScreen> {
 
       await file.writeAsBytes(response.bodyBytes);
 
-      Provider.of<AudioBooksProvider>(context, listen: false)
+      Provider.of<BibleProvider>(context, listen: false)
           .refreshDownloadedFiles();
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -84,72 +74,6 @@ class _AudioScreenState extends State<AudioScreen> {
     } finally {
       setState(() => isDownloading = false);
     }
-  }
-
-  Widget buildBookInfoSection() {
-    bool hasLongDescription = widget.description.split(' ').length > 20;
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 100,
-          height: 150,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            image: DecorationImage(
-              image: NetworkImage(widget.imageUrl),
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(widget.title,
-                  style: const TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Montserrat-SemiBold',
-                      color: Config.darkColor)),
-              const SizedBox(height: 4),
-              Text(widget.author,
-                  style: const TextStyle(
-                      fontSize: 14,
-                      fontFamily: 'Montserrat-Regular',
-                      color: Config.darkColor)),
-              const SizedBox(height: 10),
-              Text(
-                widget.description,
-                maxLines: _isExpanded ? null : 5,
-                overflow:
-                    _isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
-                style: const TextStyle(
-                    fontSize: 12,
-                    fontFamily: 'Montserrat-Regular',
-                    color: Config.darkColor),
-              ),
-              if (hasLongDescription)
-                TextButton(
-                  onPressed: () {
-                    setState(() {
-                      _isExpanded = !_isExpanded;
-                    });
-                  },
-                  child: Text(
-                    _isExpanded ? 'Read Less' : 'Read More',
-                    style: const TextStyle(
-                      color: Config.primaryColor,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ],
-    );
   }
 
   Widget buildChapterItem(int index, Map<String, dynamic> chapter) {
@@ -173,11 +97,11 @@ class _AudioScreenState extends State<AudioScreen> {
           size: 18.0,
         ),
         title: Text(
-          '${LocalizationService().translate('chapter')} ${chapter['chapter']}',
+          chapter['title'],
           style: TextStyle(
             fontFamily: 'Montserrat-SemiBold',
             color: isPlayingNow ? Config.whiteColor : Config.darkColor,
-            fontSize: 14.0,
+            fontSize: 12.0,
           ),
         ),
         trailing: Row(
@@ -190,7 +114,7 @@ class _AudioScreenState extends State<AudioScreen> {
                 size: 18.0,
               ),
               onPressed: () =>
-                  downloadChapter(audioLink, chapter['chapter'], index),
+                  downloadChapter(audioLink, chapter['title'], index),
             ),
             IconButton(
               icon: Icon(
@@ -213,7 +137,7 @@ class _AudioScreenState extends State<AudioScreen> {
   }
 
   Widget buildChapterList() {
-    final chapters = Provider.of<AudioBooksProvider>(context).books;
+    final chapters = Provider.of<BibleProvider>(context).audios;
 
     if (chapters.isEmpty) {
       return Center(child: Text(LocalizationService().translate('noData')));
@@ -243,12 +167,7 @@ class _AudioScreenState extends State<AudioScreen> {
     }
 
     return Container(
-      padding: const EdgeInsets.only(
-        left: 16.0,
-        right: 16.0,
-        bottom: 20.0,
-        top: 5.0,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: const BoxDecoration(
         color: Config.whiteColor,
         borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
@@ -303,8 +222,8 @@ class _AudioScreenState extends State<AudioScreen> {
                 onPressed: () {
                   if (currentIndex != null && currentIndex! > 0) {
                     final chapters =
-                        Provider.of<AudioBooksProvider>(context, listen: false)
-                            .books;
+                        Provider.of<BibleProvider>(context, listen: false)
+                            .audios;
                     final previousAudioLink =
                         chapters[currentIndex! - 1]['audio_link'];
                     audioProvider.playAudio(previousAudioLink);
@@ -339,8 +258,7 @@ class _AudioScreenState extends State<AudioScreen> {
                 color: Config.primaryColor,
                 onPressed: () {
                   final chapters =
-                      Provider.of<AudioBooksProvider>(context, listen: false)
-                          .books;
+                      Provider.of<BibleProvider>(context, listen: false).audios;
                   if (currentIndex != null &&
                       currentIndex! < chapters.length - 1) {
                     final nextAudioLink =
@@ -370,22 +288,13 @@ class _AudioScreenState extends State<AudioScreen> {
           icon: const Icon(Icons.arrow_back, color: Config.primaryColor),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(widget.title,
-            style: const TextStyle(
-                color: Config.darkColor,
-                fontFamily: 'Montserrat-SemiBold',
-                fontSize: 14)),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.book, color: Config.primaryColor),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) =>
-                      PDFBookView(title: widget.title, pdfUrl: widget.pdfUrl)),
-            ),
-          ),
-        ],
+        title: Text(
+          widget.title,
+          style: const TextStyle(
+              color: Config.darkColor,
+              fontFamily: 'Montserrat-SemiBold',
+              fontSize: 14),
+        ),
       ),
       body: isLoading
           ? const Center(
@@ -398,16 +307,11 @@ class _AudioScreenState extends State<AudioScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        buildBookInfoSection(),
-                        const SizedBox(height: 16),
-                        // Optional text and spacing here...
                         buildChapterList(),
                       ],
                     ),
                   ),
                 ),
-
-                // Wrapping player controls in SafeArea
                 SafeArea(
                   top: false, // we only care about bottom padding
                   child: Padding(

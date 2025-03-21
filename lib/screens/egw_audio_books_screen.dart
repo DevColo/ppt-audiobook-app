@@ -8,14 +8,14 @@ import 'package:shimmer/shimmer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class AudioBooksScreen extends StatefulWidget {
-  const AudioBooksScreen({super.key});
+class EGWAudioBooksScreen extends StatefulWidget {
+  const EGWAudioBooksScreen({super.key});
 
   @override
-  State<AudioBooksScreen> createState() => _AudioBooksScreenState();
+  State<EGWAudioBooksScreen> createState() => _EGWAudioBooksScreenState();
 }
 
-class _AudioBooksScreenState extends State<AudioBooksScreen> {
+class _EGWAudioBooksScreenState extends State<EGWAudioBooksScreen> {
   bool isLoading = true;
   String selectedLanguage = 'Kinyarwanda';
 
@@ -57,6 +57,25 @@ class _AudioBooksScreenState extends State<AudioBooksScreen> {
 
     return Scaffold(
       backgroundColor: Config.greyColor,
+      appBar: AppBar(
+        backgroundColor: Config.whiteColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Config.darkColor,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'Bitabo by Ellen G White',
+          style: TextStyle(
+            fontSize: 16,
+            fontFamily: 'Montserrat-SemiBold',
+            color: Config.darkColor,
+          ),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 1.0, horizontal: 10.0),
         child: Column(

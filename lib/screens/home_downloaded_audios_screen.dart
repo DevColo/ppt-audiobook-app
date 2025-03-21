@@ -9,14 +9,16 @@ import 'package:precious/utils/config.dart';
 import 'package:precious/utils/localization_service.dart';
 import 'package:provider/provider.dart';
 
-class DownloadedAudiosScreen extends StatefulWidget {
-  const DownloadedAudiosScreen({super.key});
+class HomeDownloadedAudiosScreen extends StatefulWidget {
+  const HomeDownloadedAudiosScreen({super.key});
 
   @override
-  State<DownloadedAudiosScreen> createState() => _DownloadedAudiosScreenState();
+  State<HomeDownloadedAudiosScreen> createState() =>
+      _HomeDownloadedAudiosScreenState();
 }
 
-class _DownloadedAudiosScreenState extends State<DownloadedAudiosScreen> {
+class _HomeDownloadedAudiosScreenState
+    extends State<HomeDownloadedAudiosScreen> {
   bool _isLoading = true;
 
   @override
@@ -62,34 +64,6 @@ class _DownloadedAudiosScreenState extends State<DownloadedAudiosScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Config.greyColor,
-      appBar: AppBar(
-        backgroundColor: Config.whiteColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Config.darkColor,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          LocalizationService().translate('downloads'),
-          style: const TextStyle(
-            fontSize: 14,
-            fontFamily: 'Montserrat-SemiBold',
-            color: Config.darkColor,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.refresh,
-              color: Config.darkColor,
-            ),
-            onPressed: _loadDownloadedFiles,
-          ),
-        ],
-      ),
       body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(
@@ -99,16 +73,17 @@ class _DownloadedAudiosScreenState extends State<DownloadedAudiosScreen> {
           : Consumer<AudioBooksProvider>(
               builder: (context, provider, child) {
                 final downloadedFiles = provider.downloadedFiles;
-
                 if (downloadedFiles.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(
-                          Icons.download_done_outlined,
-                          color: Config.darkColor,
-                          size: 64,
+                        IconButton(
+                          icon: const Icon(
+                            Icons.refresh,
+                            color: Config.darkColor,
+                          ),
+                          onPressed: _loadDownloadedFiles,
                         ),
                         const SizedBox(height: 16),
                         Text(

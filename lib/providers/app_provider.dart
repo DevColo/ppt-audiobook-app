@@ -131,5 +131,6 @@ class AppProvider with ChangeNotifier {
     // Fetch data from the API
     getPreachers();
     getNewReleasedBooks();
+    getMostReadBooks();
   }
 }

@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:precious/providers/sermons_provider.dart';
-import 'package:precious/screens/video_collection_screen.dart';
+import 'package:precious/providers/bible_provider.dart';
+import 'package:precious/screens/bible_books_screen.dart';
 import 'package:precious/utils/localization_service.dart';
-import 'package:provider/provider.dart';
 import 'package:precious/utils/config.dart';
+import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
-class SermonsScreen extends StatefulWidget {
-  const SermonsScreen({super.key});
+class BibleScreen extends StatefulWidget {
+  const BibleScreen({super.key});
 
   @override
-  State<SermonsScreen> createState() => _SermonsScreenState();
+  State<BibleScreen> createState() => _BibleScreenState();
 }
 
-class _SermonsScreenState extends State<SermonsScreen> {
+class _BibleScreenState extends State<BibleScreen> {
   bool isLoading = true;
 
   @override
@@ -35,29 +35,10 @@ class _SermonsScreenState extends State<SermonsScreen> {
   @override
   Widget build(BuildContext context) {
     Config().init(context);
-    final pastors = Provider.of<SermonsProvider>(context).pastors;
+    final pastors = Provider.of<BibleProvider>(context).testaments;
 
     return Scaffold(
       backgroundColor: Config.greyColor,
-      // appBar: AppBar(
-      //   backgroundColor: Config.whiteColor,
-      //   elevation: 0,
-      //   leading: IconButton(
-      //     icon: const Icon(
-      //       Icons.arrow_back,
-      //       color: Config.darkColor,
-      //     ),
-      //     onPressed: () => Navigator.pop(context),
-      //   ),
-      //   title: Text(
-      //     LocalizationService().translate('pastors'),
-      //     style: const TextStyle(
-      //       fontSize: 16,
-      //       fontFamily: 'Montserrat-SemiBold',
-      //       color: Config.darkColor,
-      //     ),
-      //   ),
-      // ),
       body: isLoading
           ? buildSkeletonScreen()
           : pastors.isNotEmpty
@@ -75,7 +56,7 @@ class _SermonsScreenState extends State<SermonsScreen> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Text(
-                              LocalizationService().translate('pastors'),
+                              LocalizationService().translate('bible'),
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontFamily: 'Montserrat-SemiBold',
@@ -91,11 +72,10 @@ class _SermonsScreenState extends State<SermonsScreen> {
                           itemCount: pastors.length,
                           itemBuilder: (context, index) {
                             final pastor = pastors[index];
-                            return pastorCard(
+                            return testamentCard(
                               pastor['id'],
-                              pastor['fullname'],
-                              pastor['bio'] ?? '',
-                              pastor['image_link'],
+                              pastor['title'],
+                              pastor['pdf_link'],
                             );
                           },
                         ),
@@ -103,9 +83,7 @@ class _SermonsScreenState extends State<SermonsScreen> {
                     ],
                   ),
                 )
-              : Center(
-                  child: Text(LocalizationService().translate('noData')),
-                ),
+              : const Text(''),
     );
   }
 
@@ -136,7 +114,7 @@ class _SermonsScreenState extends State<SermonsScreen> {
     );
   }
 
-  Widget pastorCard(int id, String fullname, String bio, String imageURL) {
+  Widget testamentCard(int id, String title, String pdf_link) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: GestureDetector(
@@ -145,11 +123,10 @@ class _SermonsScreenState extends State<SermonsScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => VideoCollectionScreen(
-                pastorId: id,
-                pastorName: fullname,
-                pastorBio: bio,
-                imageUrl: imageURL,
+              builder: (context) => BibleBooksScreen(
+                testament: id,
+                title: title,
+                pdfUrl: pdf_link,
               ),
             ),
           );
@@ -168,35 +145,11 @@ class _SermonsScreenState extends State<SermonsScreen> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.network(
-                    imageURL,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (BuildContext context, Widget child,
-                        ImageChunkEvent? loadingProgress) {
-                      if (loadingProgress == null) {
-                        return child;
-                      }
-                      return Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  (loadingProgress.expectedTotalBytes ?? 1)
-                              : null,
-                        ),
-                      );
-                    },
-                    errorBuilder: (BuildContext context, Object error,
-                        StackTrace? stackTrace) {
-                      return const Icon(Icons.error, color: Colors.red);
-                    },
-                  ),
-                ),
+                child: const Icon(Icons.book),
               ),
               const SizedBox(width: 15),
               Text(
-                _trimFullname(fullname),
+                title,
                 style: const TextStyle(
                   color: Color.fromARGB(255, 0, 0, 0),
                   fontFamily: 'Montserrat-SemiBold',
@@ -212,18 +165,4 @@ class _SermonsScreenState extends State<SermonsScreen> {
       ),
     );
   }
-}
-
-// Helper method to process fullname
-String _trimFullname(String fullname) {
-  // Split the fullname into words
-  final words = fullname.split(' ');
-
-  // If more than two words, keep only the first two
-  if (words.length > 2) {
-    return '${words[0]} ${words[1]}';
-  }
-
-  // Otherwise, return the fullname as is
-  return fullname;
 }

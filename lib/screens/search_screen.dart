@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:precious/components/floating_audio_player.dart';
 import 'package:precious/screens/audio_screen.dart';
 import 'package:precious/screens/video_collection_screen.dart';
 import 'package:precious/screens/video_screen.dart';
@@ -106,7 +107,7 @@ class _SearchScreenState extends State<SearchScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          LocalizationService().translate('Search'),
+          LocalizationService().translate('search'),
           style: const TextStyle(
             fontSize: 14,
             fontFamily: 'Montserrat-SemiBold',
@@ -183,16 +184,17 @@ class _SearchScreenState extends State<SearchScreen> {
                           pastor['image_link'],
                         );
                       }).toList(),
-                    if (videosResults.isNotEmpty)
-                      ...videosResults.map((video) {
-                        return videoCard(
-                          video['title'],
-                          video['video_link'],
-                        );
-                      }).toList(),
+                    // if (videosResults.isNotEmpty)
+                    //   ...videosResults.map((video) {
+                    //     return videoCard(
+                    //       video['title'],
+                    //       video['video_link'],
+                    //     );
+                    //   }).toList(),
                   ],
                 ),
               ),
+            FloatingAudioControl(),
           ],
         ),
       ),
@@ -380,63 +382,63 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget videoCard(String title, String videoLink) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5.0),
-      child: GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => VideoScreen(
-                title: title,
-                videoLink: videoLink,
-              ),
-            ),
-          );
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          padding:
-              const EdgeInsets.only(left: 0, top: 0, bottom: 0, right: 8.0),
-          child: Row(
-            children: [
-              Container(
-                height: 50,
-              ),
-              const SizedBox(width: 20.0),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: 230,
-                    //height: 40.0,
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        color: Color.fromARGB(255, 0, 0, 0),
-                        fontFamily: 'Montserrat-SemiBold',
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const Spacer(),
-              const Icon(
-                Icons.play_circle_fill,
-                color: Config.primaryColor,
-                size: 25.0,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget videoCard(String title, String videoLink) {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(vertical: 5.0),
+  //     child: GestureDetector(
+  //       onTap: () {
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //             builder: (context) => VideoScreen(
+  //               title: title,
+  //               videoLink: videoLink,
+  //             ),
+  //           ),
+  //         );
+  //       },
+  //       child: Container(
+  //         decoration: BoxDecoration(
+  //           color: Colors.white,
+  //           borderRadius: BorderRadius.circular(10),
+  //         ),
+  //         padding:
+  //             const EdgeInsets.only(left: 0, top: 0, bottom: 0, right: 8.0),
+  //         child: Row(
+  //           children: [
+  //             Container(
+  //               height: 50,
+  //             ),
+  //             const SizedBox(width: 20.0),
+  //             Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 SizedBox(
+  //                   width: 230,
+  //                   //height: 40.0,
+  //                   child: Text(
+  //                     title,
+  //                     style: const TextStyle(
+  //                       color: Color.fromARGB(255, 0, 0, 0),
+  //                       fontFamily: 'Montserrat-SemiBold',
+  //                       fontSize: 13,
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //             const Spacer(),
+  //             const Icon(
+  //               Icons.play_circle_fill,
+  //               color: Config.primaryColor,
+  //               size: 25.0,
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 }
 
 String _trimFullname(String fullname) {

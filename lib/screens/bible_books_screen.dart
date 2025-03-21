@@ -1,38 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:precious/components/floating_audio_player.dart';
-import 'package:precious/providers/sermons_provider.dart';
-import 'package:precious/screens/video_screen.dart';
+import 'package:precious/providers/bible_provider.dart';
+import 'package:precious/screens/bible_book_audio_screen.dart';
+import 'package:precious/screens/pdf_book_view.dart';
 import 'package:precious/utils/config.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
-class PlayListVideosScreen extends StatefulWidget {
+class BibleBooksScreen extends StatefulWidget {
+  final int testament;
   final String title;
-  final int playListId;
+  final String pdfUrl;
 
-  const PlayListVideosScreen({
+  const BibleBooksScreen({
     super.key,
+    required this.testament,
     required this.title,
-    required this.playListId,
+    required this.pdfUrl,
   });
 
   @override
-  State<PlayListVideosScreen> createState() => _PlayListVideosScreenState();
+  State<BibleBooksScreen> createState() => _BibleBooksScreenState();
 }
 
-class _PlayListVideosScreenState extends State<PlayListVideosScreen> {
+class _BibleBooksScreenState extends State<BibleBooksScreen> {
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    fetchVideos();
+    fetchBibleBooks();
     _loadData();
   }
 
-  Future<void> fetchVideos() async {
-    await Provider.of<SermonsProvider>(context, listen: false)
-        .getVideos(context, widget.playListId);
+  Future<void> fetchBibleBooks() async {
+    await Provider.of<BibleProvider>(context, listen: false)
+        .getBibleBooks(context, widget.testament);
   }
 
   // Simulate data fetching and update the loading state
@@ -46,7 +49,7 @@ class _PlayListVideosScreenState extends State<PlayListVideosScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final videoPlayList = Provider.of<SermonsProvider>(context).videos;
+    final bibleBooks = Provider.of<BibleProvider>(context).books;
 
     return Scaffold(
       backgroundColor: Config.greyColor,
@@ -54,20 +57,29 @@ class _PlayListVideosScreenState extends State<PlayListVideosScreen> {
         backgroundColor: Config.whiteColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Config.darkColor,
-          ),
+          icon: const Icon(Icons.arrow_back, color: Config.primaryColor),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           widget.title,
           style: const TextStyle(
-            fontSize: 12,
-            fontFamily: 'Montserrat-SemiBold',
             color: Config.darkColor,
+            fontFamily: 'Montserrat-SemiBold',
+            fontSize: 14,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.book, color: Config.primaryColor),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) =>
+                    PDFBookView(title: widget.title, pdfUrl: widget.pdfUrl),
+              ),
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -79,29 +91,28 @@ class _PlayListVideosScreenState extends State<PlayListVideosScreen> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: 5, // Placeholder count
-                    itemBuilder: (context, index) => shimmerVideoPlayList(),
+                    itemBuilder: (context, index) => shimmerBibleBooks(),
                   )
                 : ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: videoPlayList.length,
+                    itemCount: bibleBooks.length,
                     itemBuilder: (context, index) {
-                      final video = videoPlayList[index];
-                      return videoCard(
+                      final video = bibleBooks[index];
+                      return bibleBookCard(
+                        video['id'],
                         video['title'],
-                        video['video_link'],
-                        widget.playListId,
                       );
                     },
                   ),
-            FloatingAudioControl(),
+            const Center(child: FloatingAudioControl()),
           ],
         ),
       ),
     );
   }
 
-  Widget shimmerVideoPlayList() {
+  Widget shimmerBibleBooks() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Shimmer.fromColors(
@@ -112,7 +123,6 @@ class _PlayListVideosScreenState extends State<PlayListVideosScreen> {
             Container(
               height: 70,
             ),
-            const SizedBox(width: 10.0),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -121,18 +131,12 @@ class _PlayListVideosScreenState extends State<PlayListVideosScreen> {
                   height: 12,
                   color: Colors.grey[300],
                 ),
-                const SizedBox(height: 5.0),
-                Container(
-                  width: 80,
-                  height: 12,
-                  color: Colors.grey[300],
-                ),
               ],
             ),
             const Spacer(),
             const Icon(
-              Icons.play_circle_fill,
-              color: Colors.grey, // Adjusted for shimmer
+              Icons.arrow_forward_ios,
+              color: Colors.grey,
               size: 25.0,
             ),
           ],
@@ -141,7 +145,7 @@ class _PlayListVideosScreenState extends State<PlayListVideosScreen> {
     );
   }
 
-  Widget videoCard(String title, String videoLink, int playListID) {
+  Widget bibleBookCard(int id, String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: GestureDetector(
@@ -149,10 +153,9 @@ class _PlayListVideosScreenState extends State<PlayListVideosScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => VideoScreen(
+              builder: (context) => BibleBookAudioScreen(
+                bookID: id,
                 title: title,
-                videoLink: videoLink,
-                playListID: playListID,
               ),
             ),
           );
@@ -189,9 +192,9 @@ class _PlayListVideosScreenState extends State<PlayListVideosScreen> {
               ),
               const Spacer(),
               const Icon(
-                Icons.play_circle_fill,
+                Icons.arrow_forward_ios,
                 color: Config.primaryColor,
-                size: 25.0,
+                size: 20.0,
               ),
             ],
           ),
