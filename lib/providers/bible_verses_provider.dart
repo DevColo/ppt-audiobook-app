@@ -12,6 +12,9 @@ class BibleVersesProvider with ChangeNotifier {
   List<dynamic> _videos = [];
   List<dynamic> get videos => _videos;
 
+  List<dynamic> _sermons = [];
+  List<dynamic> get sermons => _sermons;
+
   // VERSES
   Future<void> _saveVersesToPrefs(List<dynamic> verses) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -87,8 +90,46 @@ class BibleVersesProvider with ChangeNotifier {
     }
   }
 
+  // SERMONS
+  Future<void> _saveSermonsToPrefs(List<dynamic> sermons) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('sermons', jsonEncode(sermons));
+  }
+
+  Future<void> _loadSermonsFromPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? _sermonsString = prefs.getString('_sermons');
+    if (_sermonsString != null) {
+      _sermons = jsonDecode(_sermonsString);
+      notifyListeners();
+    }
+  }
+
+  void setSermons(List<dynamic> sermons) {
+    _sermons = sermons;
+    notifyListeners();
+    _saveSermonsToPrefs(sermons);
+  }
+
+  Future<void> getSermons() async {
+    try {
+      // Fetch the selected language from SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? selectedLanguage =
+          prefs.getString('selectedLanguage') ?? 'Kinyarwanda';
+
+      // Pass the selected language to the API call
+      final sermons =
+          await _versesApi.getSermonsAPI(language: selectedLanguage);
+      setSermons(sermons);
+    } catch (e) {
+      print('Error fetching sermons: $e');
+    }
+  }
+
   BibleVersesProvider() {
     // Fetch data from the API
     getVerses();
+    getSermons();
   }
 }

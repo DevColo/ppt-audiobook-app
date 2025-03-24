@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:precious/providers/bible_verses_provider.dart';
-import 'package:precious/providers/categories_provider.dart';
 import 'package:precious/providers/sermons_provider.dart';
-import 'package:precious/screens/audio_books_screen.dart';
 import 'package:precious/screens/audio_screen.dart';
-import 'package:precious/screens/bible_verse_screen.dart';
+import 'package:precious/screens/bible_sermons_screen.dart';
 import 'package:precious/screens/bible_verses_screen.dart';
-import 'package:precious/screens/category_screen.dart';
 import 'package:precious/screens/egw_audio_books_screen.dart';
-import 'package:precious/screens/semons_screen.dart';
 import 'package:precious/screens/video_collection_screen.dart';
 import 'package:precious/screens/video_screen.dart';
 import 'package:precious/src/static_images.dart';
@@ -20,7 +15,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String selectedLanguage;
+
+  const HomeScreen({Key? key, required this.selectedLanguage})
+      : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -28,21 +26,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool isLoading = true;
-  final PageController _pageController = PageController();
-  String selectedLanguage = '';
 
   @override
   void initState() {
     super.initState();
     _loadData();
-    _initializeSettings();
-  }
-
-  Future<void> _initializeSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      selectedLanguage = prefs.getString('selectedLanguage') ?? 'Kinyarwanda';
-    });
   }
 
   // Simulate data fetching and update the loading state
@@ -73,6 +61,20 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             children: [
               const SizedBox(height: 10.0),
+              // Banner
+              if (widget.selectedLanguage != 'Kinyarwanda')
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                  child: Image(
+                    image: const AssetImage(banner),
+                    fit: BoxFit.cover,
+                    repeat: ImageRepeat.noRepeat,
+                    width: Config.screenWidth,
+                  ),
+                ),
+              if (widget.selectedLanguage != 'Kinyarwanda')
+                const SizedBox(height: 10.0),
+              // Preaher Header
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6.0),
                 child: Row(
@@ -171,14 +173,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                         ),
                 ),
-              if (selectedLanguage == 'Kinyarwanda')
+              // French Section
+              if (widget.selectedLanguage == 'French')
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 6.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        'Imirongo ivuga ku',
+                        'Versets',
                         style: TextStyle(
                           fontSize: 12,
                           fontFamily: 'Montserrat-SemiBold',
@@ -188,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-              if (selectedLanguage == 'Kinyarwanda')
+              if (widget.selectedLanguage == 'French')
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 0.0,
@@ -202,7 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const BibleVersesScreen(),
+                                builder: (context) => BibleVersesScreen(),
                               ),
                             );
                           },
@@ -210,100 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Container(
-                                height: 100,
-                                margin: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  image: const DecorationImage(
-                                    image: AssetImage(preciousLogo),
-                                    fit: BoxFit.cover,
-                                  ),
-                                  borderRadius: BorderRadius.circular(16),
-                                  color: Config.whiteColor,
-                                ),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.only(
-                                  right: 8.0,
-                                  left: 8.0,
-                                  top: 0.0,
-                                  bottom: 5.0,
-                                ),
-                                child: Text(
-                                  'Byigisho',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                    color: Config.darkColor,
-                                    fontFamily: 'Montserrat-SemiBold',
-                                    fontSize: 12.0,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const EGWAudioBooksScreen(),
-                              ),
-                            );
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Container(
-                                height: 100,
-                                margin: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  image: const DecorationImage(
-                                    image: AssetImage(book),
-                                    fit: BoxFit.cover,
-                                  ),
-                                  borderRadius: BorderRadius.circular(16),
-                                  color: Config.whiteColor,
-                                ),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.only(
-                                  right: 8.0,
-                                  left: 8.0,
-                                  top: 0.0,
-                                  bottom: 5.0,
-                                ),
-                                child: Text(
-                                  'Bitabo by EGW',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                    color: Config.darkColor,
-                                    fontFamily: 'Montserrat-SemiBold',
-                                    fontSize: 12.0,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const BibleVersesScreen(),
-                              ),
-                            );
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Container(
-                                height: 100,
+                                height: 80,
                                 margin: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
                                   image: const DecorationImage(
@@ -322,12 +232,225 @@ class _HomeScreenState extends State<HomeScreen> {
                                   bottom: 5.0,
                                 ),
                                 child: Text(
-                                  'Bibiliya',
+                                  'Versets \nBibliques',
                                   textAlign: TextAlign.left,
                                   style: TextStyle(
                                     color: Config.darkColor,
                                     fontFamily: 'Montserrat-SemiBold',
                                     fontSize: 12.0,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EGWAudioBooksScreen(),
+                              ),
+                            );
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Container(
+                                height: 80,
+                                margin: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  image: const DecorationImage(
+                                    image: AssetImage(book),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.circular(16),
+                                  color: Config.whiteColor,
+                                ),
+                              ),
+                              const Padding(
+                                padding: EdgeInsets.only(
+                                  right: 8.0,
+                                  left: 8.0,
+                                  top: 0.0,
+                                  bottom: 5.0,
+                                ),
+                                child: Text(
+                                  "lignes tirées des livres d'Ellen",
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                    color: Config.darkColor,
+                                    fontFamily: 'Montserrat-SemiBold',
+                                    fontSize: 12.0,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              // Kinyarwanda Section
+              if (widget.selectedLanguage == 'Kinyarwanda')
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 6.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Imirongo ivuga ku',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontFamily: 'Montserrat-SemiBold',
+                          color: Config.darkColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              if (widget.selectedLanguage == 'Kinyarwanda')
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 0.0,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BibleSermonsScreen(),
+                              ),
+                            );
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Container(
+                                height: 80,
+                                margin: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  image: const DecorationImage(
+                                    image: AssetImage(preciousLogo),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.circular(16),
+                                  color: Config.whiteColor,
+                                ),
+                              ),
+                              const Padding(
+                                padding: EdgeInsets.only(
+                                  right: 8.0,
+                                  left: 8.0,
+                                  top: 0.0,
+                                  bottom: 5.0,
+                                ),
+                                child: Text(
+                                  'Byigisho \n',
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                    color: Config.darkColor,
+                                    fontFamily: 'Montserrat-SemiBold',
+                                    fontSize: 11.0,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EGWAudioBooksScreen(),
+                              ),
+                            );
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Container(
+                                height: 80,
+                                margin: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  image: const DecorationImage(
+                                    image: AssetImage(book),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.circular(16),
+                                  color: Config.whiteColor,
+                                ),
+                              ),
+                              const Padding(
+                                padding: EdgeInsets.only(
+                                  right: 8.0,
+                                  left: 8.0,
+                                  top: 0.0,
+                                  bottom: 5.0,
+                                ),
+                                child: Text(
+                                  'Bitabo by \nEllen G White',
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                    color: Config.darkColor,
+                                    fontFamily: 'Montserrat-SemiBold',
+                                    fontSize: 11.0,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BibleVersesScreen(),
+                              ),
+                            );
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Container(
+                                height: 80,
+                                margin: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  image: const DecorationImage(
+                                    image: AssetImage(rwBible),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.circular(16),
+                                  color: Config.whiteColor,
+                                ),
+                              ),
+                              const Padding(
+                                padding: EdgeInsets.only(
+                                  right: 8.0,
+                                  left: 8.0,
+                                  top: 0.0,
+                                  bottom: 5.0,
+                                ),
+                                child: Text(
+                                  'Bibiliya \n',
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                    color: Config.darkColor,
+                                    fontFamily: 'Montserrat-SemiBold',
+                                    fontSize: 11.0,
                                   ),
                                 ),
                               ),

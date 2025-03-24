@@ -6,13 +6,23 @@ class VersesApi {
   final Dio _dio = Dio(BaseOptions(baseUrl: 'https://ppt.druptech.com'));
   //final Dio _dio = Dio(BaseOptions(baseUrl: 'http://ppt.site'));
 
-  // Get Pastors
+  // Get Bible Verses
   Future<dynamic> getVersesAPI({required String language}) async {
     try {
       final response = await _dio.get('/api/$language/bible-verses');
       return response.data;
     } catch (e) {
       throw Exception('Failed to load verses: $e');
+    }
+  }
+
+  // Get Bible Sermon
+  Future<dynamic> getSermonsAPI({required String language}) async {
+    try {
+      final response = await _dio.get('/api/$language/bible-sermons');
+      return response.data;
+    } catch (e) {
+      throw Exception('Failed to load sermons: $e');
     }
   }
 

@@ -14,21 +14,21 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 
-class BibleVerseScreen extends StatefulWidget {
+class BibleSermonScreen extends StatefulWidget {
   final String title;
   final String videoLink;
 
-  const BibleVerseScreen({
+  const BibleSermonScreen({
     super.key,
     required this.title,
     required this.videoLink,
   });
 
   @override
-  State<BibleVerseScreen> createState() => _BibleVerseScreenState();
+  State<BibleSermonScreen> createState() => _BibleSermonScreenState();
 }
 
-class _BibleVerseScreenState extends State<BibleVerseScreen> {
+class _BibleSermonScreenState extends State<BibleSermonScreen> {
   late VideoPlayerController _controller;
   bool _isLoading = true;
   bool _isControlsVisible = true;
@@ -384,7 +384,7 @@ class _BibleVerseScreenState extends State<BibleVerseScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => BibleVerseScreen(
+              builder: (context) => BibleSermonScreen(
                 title: title,
                 videoLink: videoLink,
               ),

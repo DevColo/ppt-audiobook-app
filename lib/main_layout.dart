@@ -94,13 +94,14 @@ class _MainLayoutState extends State<MainLayout> {
     final sermonsProvider =
         Provider.of<SermonsProvider>(context, listen: false);
     await sermonsProvider.getPastors();
+    await sermonsProvider.getYoutube();
 
     final audioProvider =
         Provider.of<AudioBooksProvider>(context, listen: false);
     await audioProvider.getAudioBooks();
 
     final appProvider = Provider.of<AppProvider>(context, listen: false);
-    //await appProvider.getNewReleasedBooks();
+    await appProvider.getPreachers();
     await appProvider.getMostReadBooks();
 
     final bibleProvider = Provider.of<BibleProvider>(context, listen: false);
@@ -288,7 +289,7 @@ class _MainLayoutState extends State<MainLayout> {
               });
             },
             children: <Widget>[
-              HomeScreen(),
+              HomeScreen(selectedLanguage: selectedLanguage),
               SermonsScreen(),
               AudioBooksScreen(),
               selectedLanguage == 'Kinyarwanda'

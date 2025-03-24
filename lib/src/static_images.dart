@@ -7,3 +7,4 @@ const String swImg = "assets/images/sw.png";
 const String rwImg = "assets/images/rw.png";
 const String rwBible = "assets/images/rw-bible.jpg";
 const String book = "assets/images/book.jpg";
+const String banner = "assets/images/banner.jpg";

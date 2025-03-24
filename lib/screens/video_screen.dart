@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:precious/components/floating_audio_player.dart';
 import 'package:precious/providers/sermons_provider.dart';
 import 'package:precious/utils/config.dart';
-import 'package:precious/utils/localization_service%20copy.dart';
+import 'package:precious/utils/localization_service.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';

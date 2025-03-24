@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:precious/components/floating_audio_player.dart';
 import 'package:precious/providers/bible_verses_provider.dart';
-import 'package:precious/screens/bible_verse_screen.dart';
+import 'package:precious/screens/bible_sermon_screen.dart';
 import 'package:precious/utils/config.dart';
 import 'package:precious/utils/localization_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
-class BibleVersesScreen extends StatefulWidget {
-  const BibleVersesScreen({super.key});
+class BibleSermonsScreen extends StatefulWidget {
+  const BibleSermonsScreen({super.key});
 
   @override
-  State<BibleVersesScreen> createState() => _BibleVersesScreenState();
+  State<BibleSermonsScreen> createState() => _BibleSermonsScreenState();
 }
 
-class _BibleVersesScreenState extends State<BibleVersesScreen> {
+class _BibleSermonsScreenState extends State<BibleSermonsScreen> {
   bool isLoading = true;
 
   @override
@@ -34,7 +34,7 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final verses = Provider.of<BibleVersesProvider>(context).verses;
+    final sermons = Provider.of<BibleVersesProvider>(context).sermons;
 
     return Scaffold(
       backgroundColor: Config.greyColor,
@@ -49,7 +49,7 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
           onPressed: () => Navigator.pushNamed(context, 'main'),
         ),
         title: Text(
-          LocalizationService().translate('bibleVerses'),
+          LocalizationService().translate('sermons'),
           style: const TextStyle(
             fontSize: 12,
             fontFamily: 'Montserrat-SemiBold',
@@ -67,16 +67,16 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: 5,
-                    itemBuilder: (context, index) => shimmerBibleVerses(),
+                    itemBuilder: (context, index) => shimmerBibleSermons(),
                   )
-                : verses.isNotEmpty
+                : sermons.isNotEmpty
                     ? ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        itemCount: verses.length,
+                        itemCount: sermons.length,
                         itemBuilder: (context, index) {
-                          final book = verses[index];
-                          return bibleVerse(
+                          final book = sermons[index];
+                          return bibleSermon(
                             book['id'],
                             book['title'],
                             book['video_link'],
@@ -94,7 +94,7 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
   }
 
   // shimmer Bible Verses
-  Widget shimmerBibleVerses() {
+  Widget shimmerBibleSermons() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Shimmer.fromColors(
@@ -126,16 +126,16 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
     );
   }
 
-  Widget bibleVerse(int id, String title, String videoLink) {
+  Widget bibleSermon(int id, String title, String videoLink) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: GestureDetector(
         onTap: () {
-          //Navigate to the BibleVerseScreen when tapped
+          //Navigate to the BibleSermonScreen when tapped
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => BibleVerseScreen(
+              builder: (context) => BibleSermonScreen(
                 title: title,
                 videoLink: videoLink,
               ),

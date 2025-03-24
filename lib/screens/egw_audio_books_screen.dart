@@ -67,9 +67,9 @@ class _EGWAudioBooksScreenState extends State<EGWAudioBooksScreen> {
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Bitabo by Ellen G White',
-          style: TextStyle(
+        title: Text(
+          '${LocalizationService().translate('audioBooks')} by Ellen G White',
+          style: const TextStyle(
             fontSize: 16,
             fontFamily: 'Montserrat-SemiBold',
             color: Config.darkColor,
